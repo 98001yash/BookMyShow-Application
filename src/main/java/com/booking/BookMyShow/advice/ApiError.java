@@ -2,7 +2,6 @@ package com.booking.BookMyShow.advice;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -10,8 +9,8 @@ import java.util.List;
 @Builder
 public class ApiError {
 
-    private HttpStatus status;
+    private int status;
+    private String errorCode;
     private String message;
     private List<String> subErrors;
-
 }

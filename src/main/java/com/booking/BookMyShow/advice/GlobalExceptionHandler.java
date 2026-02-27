@@ -1,79 +1,90 @@
 package com.booking.BookMyShow.advice;
 
-
-import com.booking.BookMyShow.exception.ResourceNotFoundException;
+import com.booking.BookMyShow.exception.BaseException;
+import com.booking.BookMyShow.exception.ErrorCode;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
-import java.nio.file.AccessDeniedException;
+import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<?>> handleResourceNotFound(ResourceNotFoundException exception) {
-        ApiError apiError = ApiError.builder()
-                .status(HttpStatus.NOT_FOUND)
-                .message(exception.getMessage())
-                .build();
-        return buildErrorResponseEntity(apiError);
-    }
+    // Handle custom exceptions
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ApiResponse<?>> handleBaseException(
+            BaseException ex,
+            HttpServletRequest request
+    ) {
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiResponse<?>> handleAuthenticationException(AuthenticationException ex) {
-        ApiError apiError = ApiError.builder()
-                .status(HttpStatus.UNAUTHORIZED)
+        log.warn("Business exception: {}", ex.getMessage());
+
+        ApiError error = ApiError.builder()
+                .status(ex.getHttpStatus().value())
+                .errorCode(ex.getErrorCode().name())
                 .message(ex.getMessage())
                 .build();
-        return buildErrorResponseEntity(apiError);
+
+        return buildResponse(error, ex.getHttpStatus());
     }
 
-//    @ExceptionHandler(JwtException.class)
-//    public ResponseEntity<ApiResponse<?>> handleJwtException(JwtException ex) {
-//        ApiError apiError = ApiError.builder()
-//                .status(HttpStatus.UNAUTHORIZED)
-//                .message(ex.getMessage())
-//                .build();
-//        return buildErrorResponseEntity(apiError);
-//    }
+    // Validation errors
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<?>> handleValidationException(
+            MethodArgumentNotValidException ex
+    ) {
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiResponse<?>> handleAccessDeniedException(AccessDeniedException ex) {
-        ApiError apiError = ApiError.builder()
-                .status(HttpStatus.FORBIDDEN)
-                .message(ex.getMessage())
+        List<String> subErrors = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(error -> {
+                    if (error instanceof FieldError fieldError) {
+                        return fieldError.getField() + ": " + fieldError.getDefaultMessage();
+                    }
+                    return error.getDefaultMessage();
+                })
+                .collect(Collectors.toList());
+
+        ApiError error = ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .errorCode(ErrorCode.VALIDATION_FAILED.name())
+                .message("Validation failed")
+                .subErrors(subErrors)
                 .build();
-        return buildErrorResponseEntity(apiError);
+
+        return buildResponse(error, HttpStatus.BAD_REQUEST);
     }
 
-//    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<?>> handleInternalServerError(Exception exception) {
-        ApiError apiError = ApiError.builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .message(exception.getMessage())
+    // Catch-all (NEVER expose internal message)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<?>> handleGenericException(Exception ex) {
+
+        log.error("Unhandled exception", ex);
+
+        ApiError error = ApiError.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .errorCode(ErrorCode.INTERNAL_ERROR.name())
+                .message("Something went wrong. Please try again later.")
                 .build();
-        return buildErrorResponseEntity(apiError);
+
+        return buildResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private ResponseEntity<ApiResponse<?>> buildErrorResponseEntity(ApiError apiError) {
-        return new ResponseEntity<>(new ApiResponse<>(apiError), apiError.getStatus());
-    }
+    private ResponseEntity<ApiResponse<?>> buildResponse(ApiError error, HttpStatus status) {
 
+        String traceId = MDC.get("traceId");
+
+        return new ResponseEntity<>(
+                ApiResponse.failure(error, traceId),
+                status
+        );
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

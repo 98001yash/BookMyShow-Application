@@ -1,27 +1,34 @@
 package com.booking.BookMyShow.advice;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
 
-    private LocalDateTime timeStamp;
+    private Instant timestamp;
+    private String traceId;
     private T data;
     private ApiError error;
 
-    public ApiResponse() {
-        this.timeStamp = LocalDateTime.now();
+    public static <T> ApiResponse<T> success(T data, String traceId) {
+        return ApiResponse.<T>builder()
+                .timestamp(Instant.now())
+                .traceId(traceId)
+                .data(data)
+                .build();
     }
 
-    public ApiResponse(T data) {
-        this();
-        this.data = data;
-    }
-
-    public ApiResponse(ApiError error) {
-        this();
-        this.error = error;
+    public static <T> ApiResponse<T> failure(ApiError error, String traceId) {
+        return ApiResponse.<T>builder()
+                .timestamp(Instant.now())
+                .traceId(traceId)
+                .error(error)
+                .build();
     }
 }
