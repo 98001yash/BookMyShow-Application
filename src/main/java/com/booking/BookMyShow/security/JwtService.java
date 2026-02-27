@@ -1,4 +1,4 @@
-package com.booking.BookMyShow.service;
+package com.booking.BookMyShow.security;
 
 
 import io.jsonwebtoken.Claims;
