@@ -1,4 +1,4 @@
-package com.booking.BookMyShow.dtos;
+package com.booking.BookMyShow.dtos.Movies;
 
 
 import jakarta.validation.constraints.NotBlank;
@@ -34,4 +34,6 @@ public class CreateMovieRequest {
     @NotNull(message = "Release date is required")
     @PastOrPresent(message = "Release date cannot be in the future")
     private LocalDate releaseDate;
+
+
 }
