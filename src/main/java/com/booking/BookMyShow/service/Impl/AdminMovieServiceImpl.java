@@ -4,6 +4,7 @@ import com.booking.BookMyShow.dtos.Movies.CreateMovieRequest;
 import com.booking.BookMyShow.dtos.Movies.MovieResponseDto;
 import com.booking.BookMyShow.dtos.Movies.UpdateMovieRequest;
 import com.booking.BookMyShow.entity.Movie;
+import com.booking.BookMyShow.exception.ResourceNotFoundException;
 import com.booking.BookMyShow.repository.MovieRepository;
 import com.booking.BookMyShow.service.AdminMovieService;
 import lombok.RequiredArgsConstructor;
@@ -53,12 +54,56 @@ public class AdminMovieServiceImpl implements AdminMovieService {
 
     @Override
     public MovieResponseDto updateM0vie(Long movieId, UpdateMovieRequest request) {
-        return null;
+
+
+        log.info("Admin attempting to update movie id: {}",movieId);
+
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() ->{
+                    log.warn("Movie not found with id: {}",movieId);
+                    return new ResourceNotFoundException("Movie not found");
+                });
+
+        if (request.getTitle() != null) {
+            movie.setTitle(request.getTitle());
+        }
+
+        if (request.getLanguage() != null) {
+            movie.setLanguage(request.getLanguage());
+        }
+
+        if (request.getDurationMinutes() != null) {
+            movie.setDurationMinutes(request.getDurationMinutes());
+        }
+
+        if (request.getGenre() != null) {
+            movie.setGenre(request.getGenre());
+        }
+
+        if (request.getReleaseDate() != null) {
+            movie.setReleaseDate(request.getReleaseDate());
+        }
+
+        Movie updated = movieRepository.save(movie);
+        log.info("Movie updated successfully id: {}", movieId);
+        return mapToResponse(updated);
     }
 
     @Override
     public void deactivateMovie(Long movieId) {
 
+        log.info("Admin attempting to deactivate movie Id: {}",movieId);
+
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(()-> {
+                    log.warn("Movie not found for deactivation id: {}",movieId);
+                    return new ResourceNotFoundException("Movie not found");
+                });
+
+                movie.setActive(false);
+                movieRepository.save(movie);
+
+                log.info("Movie deactivated id: {}",movieId);
     }
 
     @Override
