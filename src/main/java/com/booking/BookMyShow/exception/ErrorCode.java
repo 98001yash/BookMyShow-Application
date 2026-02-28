@@ -8,6 +8,7 @@ public enum ErrorCode {
     RESOURCE_NOT_FOUND,
     UNAUTHORIZED,
     ACCESS_DENIED,
+    RESOURCE_ALREADY_EXISTS,
 
     // Seat
     SEAT_ALREADY_LOCKED,

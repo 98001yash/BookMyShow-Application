@@ -5,6 +5,7 @@ import com.booking.BookMyShow.dtos.Movies.MovieResponseDto;
 import com.booking.BookMyShow.dtos.Movies.MovieSummaryResponse;
 import com.booking.BookMyShow.dtos.Movies.UpdateMovieRequest;
 import com.booking.BookMyShow.entity.Movie;
+import com.booking.BookMyShow.exception.ResourceAlreadyExistsException;
 import com.booking.BookMyShow.exception.ResourceNotFoundException;
 import com.booking.BookMyShow.repository.MovieRepository;
 import com.booking.BookMyShow.service.AdminMovieService;
@@ -37,7 +38,7 @@ public class AdminMovieServiceImpl implements AdminMovieService {
             log.warn("Duplicate movie creation attempt: {} - {}",
                     request.getTitle(), request.getLanguage());
 
-            throw new RuntimeException("Movie already exists with same title and language");
+            throw new ResourceAlreadyExistsException("Movie already exists with same title and language");
         }
 
         Movie movie = Movie.builder()
