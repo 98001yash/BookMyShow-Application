@@ -2,6 +2,7 @@ package com.booking.BookMyShow.service;
 
 import com.booking.BookMyShow.dtos.Movies.CreateMovieRequest;
 import com.booking.BookMyShow.dtos.Movies.MovieResponseDto;
+import com.booking.BookMyShow.dtos.Movies.MovieSummaryResponse;
 import com.booking.BookMyShow.dtos.Movies.UpdateMovieRequest;
 
 import java.util.List;
@@ -18,5 +19,5 @@ public interface AdminMovieService {
 
     MovieResponseDto getMovieById(Long movieId);
 
-    List<MovieResponseDto> getAllMovies();
+    List<MovieSummaryResponse> getAllMovies();
 }

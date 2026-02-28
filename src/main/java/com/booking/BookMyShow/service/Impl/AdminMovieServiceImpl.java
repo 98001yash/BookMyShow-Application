@@ -2,6 +2,7 @@ package com.booking.BookMyShow.service.Impl;
 
 import com.booking.BookMyShow.dtos.Movies.CreateMovieRequest;
 import com.booking.BookMyShow.dtos.Movies.MovieResponseDto;
+import com.booking.BookMyShow.dtos.Movies.MovieSummaryResponse;
 import com.booking.BookMyShow.dtos.Movies.UpdateMovieRequest;
 import com.booking.BookMyShow.entity.Movie;
 import com.booking.BookMyShow.exception.ResourceNotFoundException;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -108,17 +110,44 @@ public class AdminMovieServiceImpl implements AdminMovieService {
 
     @Override
     public void activateMovie(Long movieId) {
+     log.info("Admin attempting to activate movie Id: {}",movieId);
 
+     Movie movie = movieRepository.findById(movieId)
+             .orElseThrow(()-> {
+                 log.warn("Movie not found for activation id: {}",movieId);
+                 return new ResourceNotFoundException("Movie not found");
+             });
+     movie.setActive(true);
+     movieRepository.save(movie);
+
+     log.info("Movie activated id: {}",movieId);
     }
 
     @Override
     public MovieResponseDto getMovieById(Long movieId) {
-        return null;
+
+        log.info("Fetching movie with id: {}",movieId);
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(()-> {
+                    log.warn("Movie not found id: {}",movieId);
+                    return new ResourceNotFoundException("Movie not found");
+                });
+        return mapToResponse(movie);
     }
 
     @Override
-    public List<MovieResponseDto> getAllMovies() {
-        return List.of();
+    public List<MovieSummaryResponse> getAllMovies() {
+        log.info("Fetching all movies");
+
+        return movieRepository.findAll()
+                .stream()
+                .map(movie -> MovieSummaryResponse.builder()
+                        .id(movie.getId())
+                        .title(movie.getTitle())
+                        .language(movie.getLanguage())
+                        .active(movie.getActive())
+                        .build())
+                .collect(Collectors.toList());
     }
 
 
