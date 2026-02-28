@@ -11,6 +11,10 @@ import com.booking.BookMyShow.repository.MovieRepository;
 import com.booking.BookMyShow.service.AdminMovieService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -137,18 +141,32 @@ public class AdminMovieServiceImpl implements AdminMovieService {
     }
 
     @Override
-    public List<MovieSummaryResponse> getAllMovies() {
-        log.info("Fetching all movies");
+    public Page<MovieSummaryResponse> getAllMovies(
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    ) {
 
-        return movieRepository.findAll()
-                .stream()
-                .map(movie -> MovieSummaryResponse.builder()
+        log.info("Fetching movies - page: {}, size: {}, sortBy: {}, direction: {}",
+                page, size, sortBy, direction);
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Movie> moviePage = movieRepository.findAll(pageable);
+
+        return moviePage.map(movie ->
+                MovieSummaryResponse.builder()
                         .id(movie.getId())
                         .title(movie.getTitle())
                         .language(movie.getLanguage())
                         .active(movie.getActive())
-                        .build())
-                .collect(Collectors.toList());
+                        .build()
+        );
     }
 
 

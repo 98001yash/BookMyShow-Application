@@ -1,0 +1,70 @@
+INSERT INTO movies (title, language, duration_minutes, genre, release_date, active) VALUES
+                                                                                        ('Avengers: Endgame', 'English', '180', 'Action', '2019-04-26', true),
+                                                                                        ('Inception', 'English', '148', 'Sci-Fi', '2010-07-16', true),
+                                                                                        ('Interstellar', 'English', '169', 'Sci-Fi', '2014-11-07', true),
+                                                                                        ('The Dark Knight', 'English', '152', 'Action', '2008-07-18', true),
+                                                                                        ('Titanic', 'English', '195', 'Romance', '1997-12-19', true),
+                                                                                        ('Gladiator', 'English', '155', 'Drama', '2000-05-05', true),
+                                                                                        ('Joker', 'English', '122', 'Thriller', '2019-10-04', true),
+                                                                                        ('Frozen', 'English', '102', 'Animation', '2013-11-27', true),
+                                                                                        ('Toy Story', 'English', '81', 'Animation', '1995-11-22', true),
+                                                                                        ('The Matrix', 'English', '136', 'Sci-Fi', '1999-03-31', true),
+
+                                                                                        ('RRR', 'Telugu', '182', 'Action', '2022-03-25', true),
+                                                                                        ('Baahubali', 'Telugu', '159', 'Fantasy', '2015-07-10', true),
+                                                                                        ('Pushpa', 'Telugu', '179', 'Action', '2021-12-17', true),
+                                                                                        ('Arjun Reddy', 'Telugu', '182', 'Drama', '2017-08-25', true),
+                                                                                        ('Magadheera', 'Telugu', '147', 'Fantasy', '2009-07-31', true),
+
+                                                                                        ('KGF Chapter 1', 'Kannada', '155', 'Action', '2018-12-21', true),
+                                                                                        ('KGF Chapter 2', 'Kannada', '168', 'Action', '2022-04-14', true),
+                                                                                        ('Kantara', 'Kannada', '150', 'Thriller', '2022-09-30', true),
+                                                                                        ('Charlie 777', 'Kannada', '164', 'Drama', '2022-06-10', true),
+
+                                                                                        ('Dangal', 'Hindi', '161', 'Sports', '2016-12-23', true),
+                                                                                        ('3 Idiots', 'Hindi', '171', 'Comedy', '2009-12-25', true),
+                                                                                        ('PK', 'Hindi', '153', 'Comedy', '2014-12-19', true),
+                                                                                        ('Pathaan', 'Hindi', '146', 'Action', '2023-01-25', true),
+                                                                                        ('Jawan', 'Hindi', '169', 'Action', '2023-09-07', true),
+                                                                                        ('Animal', 'Hindi', '201', 'Crime', '2023-12-01', true),
+
+                                                                                        ('Parasite', 'Korean', '132', 'Thriller', '2019-05-30', true),
+                                                                                        ('Train to Busan', 'Korean', '118', 'Horror', '2016-07-20', true),
+                                                                                        ('Oldboy', 'Korean', '120', 'Thriller', '2003-11-21', true),
+
+                                                                                        ('Spirited Away', 'Japanese', '125', 'Animation', '2001-07-20', true),
+                                                                                        ('Your Name', 'Japanese', '106', 'Romance', '2016-08-26', true),
+                                                                                        ('Demon Slayer: Mugen Train', 'Japanese', '117', 'Animation', '2020-10-16', true),
+
+                                                                                        ('The Godfather', 'English', '175', 'Crime', '1972-03-24', true),
+                                                                                        ('The Shawshank Redemption', 'English', '142', 'Drama', '1994-09-23', true),
+                                                                                        ('Forrest Gump', 'English', '142', 'Drama', '1994-07-06', true),
+                                                                                        ('The Lion King', 'English', '88', 'Animation', '1994-06-15', true),
+                                                                                        ('Jurassic Park', 'English', '127', 'Adventure', '1993-06-11', true),
+
+                                                                                        ('Sholay', 'Hindi', '204', 'Action', '1975-08-15', true),
+                                                                                        ('Lagaan', 'Hindi', '224', 'Drama', '2001-06-15', true),
+                                                                                        ('Kabir Singh', 'Hindi', '173', 'Drama', '2019-06-21', true),
+                                                                                        ('Gully Boy', 'Hindi', '153', 'Drama', '2019-02-14', true),
+
+                                                                                        ('The Batman', 'English', '176', 'Action', '2022-03-04', true),
+                                                                                        ('Doctor Strange', 'English', '115', 'Fantasy', '2016-11-04', true),
+                                                                                        ('Iron Man', 'English', '126', 'Action', '2008-05-02', true),
+                                                                                        ('Thor Ragnarok', 'English', '130', 'Action', '2017-11-03', true),
+                                                                                        ('Black Panther', 'English', '134', 'Action', '2018-02-16', true),
+
+                                                                                        ('Sita Ramam', 'Telugu', '163', 'Romance', '2022-08-05', true),
+                                                                                        ('Jersey', 'Telugu', '157', 'Drama', '2019-04-19', true),
+                                                                                        ('Ala Vaikunthapurramuloo', 'Telugu', '165', 'Drama', '2020-01-12', true),
+
+                                                                                        ('Drishyam', 'Malayalam', '160', 'Thriller', '2013-12-19', true),
+                                                                                        ('Premam', 'Malayalam', '156', 'Romance', '2015-05-29', true),
+
+                                                                                        ('The Conjuring', 'English', '112', 'Horror', '2013-07-19', true),
+                                                                                        ('It', 'English', '135', 'Horror', '2017-09-08', true),
+                                                                                        ('Oppenheimer', 'English', '180', 'Biography', '2023-07-21', true),
+                                                                                        ('Barbie', 'English', '114', 'Comedy', '2023-07-21', true),
+                                                                                        ('Top Gun Maverick', 'English', '130', 'Action', '2022-05-27', true),
+                                                                                        ('Mission Impossible Fallout', 'English', '147', 'Action', '2018-07-27', true),
+                                                                                        ('John Wick', 'English', '101', 'Action', '2014-10-24', true),
+                                                                                        ('Fast and Furious 7', 'English', '137', 'Action', '2015-04-03', true);

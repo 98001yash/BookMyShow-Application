@@ -9,6 +9,7 @@ import com.booking.BookMyShow.service.AdminMovieService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,8 +64,13 @@ public class AdminMovieController {
 
 
     @GetMapping
-    public List<MovieSummaryResponse> getAllMovies() {
-        log.info("Received request to fetch all movies");
-        return adminMovieService.getAllMovies();
+    public Page<MovieSummaryResponse> getAllMovies(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        log.info("Received request to fetch paginated movies");
+        return adminMovieService.getAllMovies(page, size, sortBy, direction);
     }
 }

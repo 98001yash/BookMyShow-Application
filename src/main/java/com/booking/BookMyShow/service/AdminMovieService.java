@@ -4,6 +4,7 @@ import com.booking.BookMyShow.dtos.Movies.CreateMovieRequest;
 import com.booking.BookMyShow.dtos.Movies.MovieResponseDto;
 import com.booking.BookMyShow.dtos.Movies.MovieSummaryResponse;
 import com.booking.BookMyShow.dtos.Movies.UpdateMovieRequest;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -19,5 +20,10 @@ public interface AdminMovieService {
 
     MovieResponseDto getMovieById(Long movieId);
 
-    List<MovieSummaryResponse> getAllMovies();
+    Page<MovieSummaryResponse> getAllMovies(
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    );
 }
