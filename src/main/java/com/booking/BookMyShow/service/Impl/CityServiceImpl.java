@@ -2,6 +2,7 @@ package com.booking.BookMyShow.service.Impl;
 
 import com.booking.BookMyShow.dtos.city.CityResponseDto;
 import com.booking.BookMyShow.dtos.city.CreateCityRequest;
+import com.booking.BookMyShow.dtos.city.PublicCityResponse;
 import com.booking.BookMyShow.entity.City;
 import com.booking.BookMyShow.exception.ResourceAlreadyExistsException;
 import com.booking.BookMyShow.exception.ResourceNotFoundException;
@@ -120,7 +121,33 @@ public class CityServiceImpl implements CityService {
         log.info("City deactivated: {}", id);
     }
 
+    @Override
+    public List<PublicCityResponse> getActiveCities() {
 
+        log.info("Fetching all active cities for public API");
+
+        return cityRepository.findAllByActiveTrueOrderByNameAsc()
+                .stream()
+                .map(city -> PublicCityResponse.builder()
+                        .id(city.getId())
+                        .name(city.getName())
+                        .slug(city.getSlug())
+                        .build()
+                )
+                .toList();
+    }
+
+    @Override
+    public PublicCityResponse getCityBySlug(String slug) {
+        City city = cityRepository.findBySlugAndActiveTrue(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("City not found"));
+
+        return PublicCityResponse.builder()
+                .id(city.getId())
+                .name(city.getName())
+                .slug(city.getSlug())
+                .build();
+    }
 
     private CityResponseDto mapToResponse(City city) {
 

@@ -2,7 +2,10 @@ package com.booking.BookMyShow.service;
 
 import com.booking.BookMyShow.dtos.city.CityResponseDto;
 import com.booking.BookMyShow.dtos.city.CreateCityRequest;
+import com.booking.BookMyShow.dtos.city.PublicCityResponse;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface CityService {
 
@@ -20,4 +23,8 @@ public interface CityService {
     void activateCity(Long id);
 
     void deactivateCity(Long id);
+
+    List<PublicCityResponse> getActiveCities();
+
+    PublicCityResponse getCityBySlug(String slug);
 }
