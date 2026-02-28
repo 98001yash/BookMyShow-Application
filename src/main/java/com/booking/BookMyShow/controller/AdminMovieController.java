@@ -55,7 +55,7 @@ public class AdminMovieController {
         adminMovieService.deactivateMovie(id);
     }
 
-
+    @GetMapping("/{id}")
     public MovieResponseDto getMovieById(@PathVariable Long id) {
         log.info("Received request to fetch movie id: {}", id);
         return adminMovieService.getMovieById(id);
