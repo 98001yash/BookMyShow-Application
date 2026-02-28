@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -16,19 +17,32 @@ public class ApiResponse<T> {
     private T data;
     private ApiError error;
 
-    public static <T> ApiResponse<T> success(T data, String traceId) {
+    // -----------------------------
+    // SUCCESS RESPONSE
+    // -----------------------------
+    public static <T> ApiResponse<T> success(T data) {
         return ApiResponse.<T>builder()
                 .timestamp(Instant.now())
-                .traceId(traceId)
+                .traceId(generateTraceId())
                 .data(data)
                 .build();
     }
 
+    // -----------------------------
+    // FAILURE RESPONSE
+    // -----------------------------
     public static <T> ApiResponse<T> failure(ApiError error, String traceId) {
         return ApiResponse.<T>builder()
                 .timestamp(Instant.now())
-                .traceId(traceId)
+                .traceId(generateTraceId())
                 .error(error)
                 .build();
+    }
+
+    // -----------------------------
+    // TRACE ID GENERATOR
+    // -----------------------------
+    private static String generateTraceId() {
+        return UUID.randomUUID().toString();
     }
 }

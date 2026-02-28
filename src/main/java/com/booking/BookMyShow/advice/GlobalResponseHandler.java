@@ -31,6 +31,6 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
 
         String traceId = MDC.get("traceId");
 
-        return ApiResponse.success(body, traceId);
+        return ApiResponse.success(body);
     }
 }
