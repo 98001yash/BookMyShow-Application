@@ -18,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,10 +25,11 @@ import java.util.stream.Collectors;
 public class AdminMovieServiceImpl implements AdminMovieService {
 
     private final MovieRepository movieRepository;
+
     @Override
     public MovieResponseDto createMovie(CreateMovieRequest request) {
 
-        log.info("Admin attempting to create a movie: {} - {}",
+        log.info("Admin creating movie: {} | Language: {}",
                 request.getTitle(), request.getLanguage());
 
         boolean exists = movieRepository
@@ -38,105 +38,122 @@ public class AdminMovieServiceImpl implements AdminMovieService {
                         request.getLanguage()
                 );
 
-        if(exists){
-            log.warn("Duplicate movie creation attempt: {} - {}",
+        if (exists) {
+            log.warn("Duplicate movie creation blocked: {} - {}",
                     request.getTitle(), request.getLanguage());
 
-            throw new ResourceAlreadyExistsException("Movie already exists with same title and language");
+            throw new ResourceAlreadyExistsException(
+                    "Active movie already exists with same title and language"
+            );
         }
 
         Movie movie = Movie.builder()
-                .title(request.getTitle())
-                .language(request.getLanguage())
+                .title(request.getTitle().trim())
+                .language(request.getLanguage().trim())
                 .durationMinutes(request.getDurationMinutes())
                 .genre(request.getGenre())
                 .releaseDate(request.getReleaseDate())
+                .description(request.getDescription())
+                .posterUrl(request.getPosterUrl())
+                .bannerImageUrl(request.getBannerImageUrl())
+                .trailerUrl(request.getTrailerUrl())
+                .certification(request.getCertification())
+                .imdbId(request.getImdbId())
+                .rating(request.getRating() != null ? request.getRating() : 0.0)
+                .popularityScore(0)
+                .featured(Boolean.TRUE.equals(request.getFeatured()))
                 .active(true)
                 .build();
 
         Movie saved = movieRepository.save(movie);
-        log.info("Movie created successfully eith id: {}",saved.getId());
+
+        log.info("Movie created successfully with ID: {}", saved.getId());
+
         return mapToResponse(saved);
     }
 
     @Override
     public MovieResponseDto updateM0vie(Long movieId, UpdateMovieRequest request) {
-
-
-        log.info("Admin attempting to update movie id: {}",movieId);
+        log.info("Admin updating movie ID: {}", movieId);
 
         Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(() ->{
-                    log.warn("Movie not found with id: {}",movieId);
+                .orElseThrow(() -> {
+                    log.warn("Movie not found for update: {}", movieId);
                     return new ResourceNotFoundException("Movie not found");
                 });
 
-        if (request.getTitle() != null) {
-            movie.setTitle(request.getTitle());
+        // Prevent duplicate title+language combination
+        if (request.getTitle() != null && request.getLanguage() != null) {
+            boolean exists = movieRepository
+                    .existsByTitleIgnoreCaseAndLanguageIgnoreCaseAndActiveTrue(
+                            request.getTitle(),
+                            request.getLanguage()
+                    );
+
+            if (exists &&
+                    !(movie.getTitle().equalsIgnoreCase(request.getTitle())
+                            && movie.getLanguage().equalsIgnoreCase(request.getLanguage()))) {
+
+                throw new ResourceAlreadyExistsException(
+                        "Another movie already exists with same title and language"
+                );
+            }
         }
 
-        if (request.getLanguage() != null) {
-            movie.setLanguage(request.getLanguage());
-        }
-
-        if (request.getDurationMinutes() != null) {
-            movie.setDurationMinutes(request.getDurationMinutes());
-        }
-
-        if (request.getGenre() != null) {
-            movie.setGenre(request.getGenre());
-        }
-
-        if (request.getReleaseDate() != null) {
-            movie.setReleaseDate(request.getReleaseDate());
-        }
+        // Partial updates
+        if (request.getTitle() != null) movie.setTitle(request.getTitle().trim());
+        if (request.getLanguage() != null) movie.setLanguage(request.getLanguage().trim());
+        if (request.getDurationMinutes() != null) movie.setDurationMinutes(request.getDurationMinutes());
+        if (request.getGenre() != null) movie.setGenre(request.getGenre());
+        if (request.getReleaseDate() != null) movie.setReleaseDate(request.getReleaseDate());
+        if (request.getDescription() != null) movie.setDescription(request.getDescription());
+        if (request.getPosterUrl() != null) movie.setPosterUrl(request.getPosterUrl());
+        if (request.getBannerImageUrl() != null) movie.setBannerImageUrl(request.getBannerImageUrl());
+        if (request.getTrailerUrl() != null) movie.setTrailerUrl(request.getTrailerUrl());
+        if (request.getCertification() != null) movie.setCertification(request.getCertification());
+        if (request.getRating() != null) movie.setRating(request.getRating());
+        if (request.getPopularityScore() != null) movie.setPopularityScore(request.getPopularityScore());
+        if (request.getFeatured() != null) movie.setFeatured(request.getFeatured());
+        if (request.getActive() != null) movie.setActive(request.getActive());
 
         Movie updated = movieRepository.save(movie);
-        log.info("Movie updated successfully id: {}", movieId);
+
+        log.info("Movie updated successfully ID: {}", movieId);
+
         return mapToResponse(updated);
     }
+
 
     @Override
     public void deactivateMovie(Long movieId) {
 
-        log.info("Admin attempting to deactivate movie Id: {}",movieId);
+        log.info("Deactivating movie ID: {}", movieId);
 
         Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(()-> {
-                    log.warn("Movie not found for deactivation id: {}",movieId);
-                    return new ResourceNotFoundException("Movie not found");
-                });
+                .orElseThrow(() -> new ResourceNotFoundException("Movie not found"));
 
-                movie.setActive(false);
-                movieRepository.save(movie);
-
-                log.info("Movie deactivated id: {}",movieId);
+        movie.setActive(false);
+        movieRepository.save(movie);
     }
 
     @Override
     public void activateMovie(Long movieId) {
-     log.info("Admin attempting to activate movie Id: {}",movieId);
 
-     Movie movie = movieRepository.findById(movieId)
-             .orElseThrow(()-> {
-                 log.warn("Movie not found for activation id: {}",movieId);
-                 return new ResourceNotFoundException("Movie not found");
-             });
-     movie.setActive(true);
-     movieRepository.save(movie);
+        log.info("Activating movie ID: {}", movieId);
 
-     log.info("Movie activated id: {}",movieId);
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie not found"));
+
+        movie.setActive(true);
+        movieRepository.save(movie);
     }
 
     @Override
     public MovieResponseDto getMovieById(Long movieId) {
 
-        log.info("Fetching movie with id: {}",movieId);
         Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(()-> {
-                    log.warn("Movie not found id: {}",movieId);
-                    return new ResourceNotFoundException("Movie not found");
-                });
+                .orElseThrow(() -> new ResourceNotFoundException("Movie not found"));
+
         return mapToResponse(movie);
     }
 
@@ -148,8 +165,18 @@ public class AdminMovieServiceImpl implements AdminMovieService {
             String direction
     ) {
 
-        log.info("Fetching movies - page: {}, size: {}, sortBy: {}, direction: {}",
-                page, size, sortBy, direction);
+        List<String> allowedSortFields = List.of(
+                "id",
+                "title",
+                "releaseDate",
+                "rating",
+                "popularityScore",
+                "createdAt"
+        );
+
+        if (!allowedSortFields.contains(sortBy)) {
+            sortBy = "id";
+        }
 
         Sort sort = direction.equalsIgnoreCase("desc")
                 ? Sort.by(sortBy).descending()
@@ -164,12 +191,18 @@ public class AdminMovieServiceImpl implements AdminMovieService {
                         .id(movie.getId())
                         .title(movie.getTitle())
                         .language(movie.getLanguage())
+                        .posterUrl(movie.getPosterUrl())
+                        .rating(movie.getRating())
+                        .certification(
+                                movie.getCertification() != null
+                                        ? movie.getCertification().name()
+                                        : null
+                        )
+                        .featured(movie.getFeatured())
                         .active(movie.getActive())
                         .build()
         );
     }
-
-
 
     private MovieResponseDto mapToResponse(Movie movie) {
 
@@ -180,7 +213,18 @@ public class AdminMovieServiceImpl implements AdminMovieService {
                 .durationMinutes(movie.getDurationMinutes())
                 .genre(movie.getGenre())
                 .releaseDate(movie.getReleaseDate())
+                .description(movie.getDescription())
+                .posterUrl(movie.getPosterUrl())
+                .bannerImageUrl(movie.getBannerImageUrl())
+                .trailerUrl(movie.getTrailerUrl())
+                .certification(movie.getCertification())
+                .imdbId(movie.getImdbId())
+                .rating(movie.getRating())
+                .popularityScore(movie.getPopularityScore())
+                .featured(movie.getFeatured())
                 .active(movie.getActive())
+                .createdAt(movie.getCreatedAt())
+                .updatedAt(movie.getUpdatedAt())
                 .build();
     }
 }

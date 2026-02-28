@@ -1,10 +1,8 @@
 package com.booking.BookMyShow.dtos.Movies;
 
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Size;
+import com.booking.BookMyShow.enums.Certification;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -16,24 +14,39 @@ import java.time.LocalDate;
 @Builder
 public class CreateMovieRequest {
 
-    @NotBlank(message = "Title is required")
+    @NotBlank
     @Size(max = 150)
     private String title;
 
-    @NotBlank(message = "language is required")
+    @NotBlank
     @Size(max = 50)
     private String language;
 
-    @NotBlank(message = "duration is required")
+    @NotBlank
     private String durationMinutes;
 
-    @NotBlank(message = "Genre is required")
+    @NotBlank
     @Size(max = 100)
     private String genre;
 
-    @NotNull(message = "Release date is required")
-    @PastOrPresent(message = "Release date cannot be in the future")
+    @NotNull
+    @PastOrPresent
     private LocalDate releaseDate;
 
+    @Size(max = 2000)
+    private String description;
 
+    private String posterUrl;
+    private String bannerImageUrl;
+    private String trailerUrl;
+
+    private Certification certification;
+
+    private String imdbId;
+
+    @DecimalMin("0.0")
+    @DecimalMax("10.0")
+    private Double rating;
+
+    private Boolean featured;
 }

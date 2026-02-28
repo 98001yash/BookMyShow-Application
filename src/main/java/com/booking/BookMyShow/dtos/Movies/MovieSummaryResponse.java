@@ -1,6 +1,5 @@
 package com.booking.BookMyShow.dtos.Movies;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,12 +11,19 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MovieSummaryResponse {
 
-
     private Long id;
 
     private String title;
 
     private String language;
+
+    private String posterUrl;
+
+    private Double rating;
+
+    private String certification;
+
+    private Boolean featured;
 
     private Boolean active;
 }
