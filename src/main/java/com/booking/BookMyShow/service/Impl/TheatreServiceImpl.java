@@ -1,9 +1,6 @@
 package com.booking.BookMyShow.service.Impl;
 
-import com.booking.BookMyShow.dtos.Theatre.CreateTheatreRequest;
-import com.booking.BookMyShow.dtos.Theatre.TheatreResponseDto;
-import com.booking.BookMyShow.dtos.Theatre.TheatreSummaryResponse;
-import com.booking.BookMyShow.dtos.Theatre.UpdateTheatreRequest;
+import com.booking.BookMyShow.dtos.Theatre.*;
 import com.booking.BookMyShow.entity.City;
 import com.booking.BookMyShow.entity.Theatre;
 import com.booking.BookMyShow.exception.ResourceAlreadyExistsException;
@@ -24,6 +21,7 @@ import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -148,15 +146,25 @@ public class TheatreServiceImpl implements TheatreService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TheatreSummaryResponse> getNearbyTheatres(double latitude, double longitude, double radius) {
-        return List.of();
+    public List<PublicTheatreResponse> getNearbyTheatres(double latitude,
+                                                          double longitude,
+                                                          double radius) {
+        List<Theatre> theatres =
+                theatreRepository.findNearbyTheatres(latitude, longitude, radius);
+
+        return theatres.stream()
+                .map(theatre -> PublicTheatreResponse.builder()
+                        .id(theatre.getId())
+                        .name(theatre.getName())
+                        .address(theatre.getAddress())
+                        .latitude(theatre.getLatitude())
+                        .longitude(theatre.getLongitude())
+                        .distance(null) // can calculate separately if needed
+                        .build())
+                .collect(Collectors.toList());
     }
 
-
-
-    // ===============================
     // MAPPERS
-    // ===============================
 
     private TheatreResponseDto mapToResponse(Theatre theatre) {
 
@@ -185,10 +193,8 @@ public class TheatreServiceImpl implements TheatreService {
                 .build();
     }
 
-    // ===============================
-    // SLUG GENERATOR
-    // ===============================
 
+    // SLUG GENERATOR
     private String generateSlug(String theatreName, String cityName) {
 
         String base = theatreName + "-" + cityName;

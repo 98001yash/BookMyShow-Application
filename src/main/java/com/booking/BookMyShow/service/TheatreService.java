@@ -1,9 +1,6 @@
 package com.booking.BookMyShow.service;
 
-import com.booking.BookMyShow.dtos.Theatre.CreateTheatreRequest;
-import com.booking.BookMyShow.dtos.Theatre.TheatreResponseDto;
-import com.booking.BookMyShow.dtos.Theatre.TheatreSummaryResponse;
-import com.booking.BookMyShow.dtos.Theatre.UpdateTheatreRequest;
+import com.booking.BookMyShow.dtos.Theatre.*;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -26,7 +23,7 @@ public interface TheatreService {
                                                    String sortBy,
                                                    String direction);
 
-    List<TheatreSummaryResponse> getNearbyTheatres(
+    List<PublicTheatreResponse> getNearbyTheatres(
             double latitude,
             double longitude,
             double radius
