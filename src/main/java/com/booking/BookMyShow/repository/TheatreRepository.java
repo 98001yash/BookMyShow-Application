@@ -37,25 +37,26 @@ public interface TheatreRepository extends JpaRepository<Theatre,Long> {
     List<Theatre> findAllByCity_IdAndActiveTrue(Long cityId);
 
 
-    // ------------------------------------------------------
     // Geo-distance based theatre search
-    // ------------------------------------------------------
     @Query(value = """
+    SELECT * FROM (
         SELECT t.*,
         (
             6371 * acos(
-                cos(radians(:lat)) *
-                cos(radians(t.latitude)) *
-                cos(radians(t.longitude) - radians(:lng)) +
-                sin(radians(:lat)) *
-                sin(radians(t.latitude))
-            )
-        ) AS distance
+              LEAST(1.0,
+                  cos(radians(:lat)) *
+                  cos(radians(t.latitude)) *
+                  cos(radians(t.longitude) - radians(:lng)) +
+                  sin(radians(:lat)) *
+                  sin(radians(t.latitude))
+              )
+          ) AS distance
         FROM theatres t
         WHERE t.active = true
-        HAVING distance <= :radius
-        ORDER BY distance
-        """,
+    ) AS calculated
+    WHERE calculated.distance <= :radius
+    ORDER BY calculated.distance
+    """,
             nativeQuery = true)
     List<Theatre> findNearbyTheatres(
             @Param("lat") double latitude,
