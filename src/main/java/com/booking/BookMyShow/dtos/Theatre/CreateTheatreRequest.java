@@ -1,12 +1,8 @@
 package com.booking.BookMyShow.dtos.Theatre;
 
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -20,13 +16,8 @@ public class CreateTheatreRequest {
     @NotNull
     private Long cityId;
 
+    @NotBlank
     private String address;
 
     private String contactNumber;
-
-    @NotNull
-    private Double latitude;
-
-    @NotNull
-    private Double  longitude;
 }

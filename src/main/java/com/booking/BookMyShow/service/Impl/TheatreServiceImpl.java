@@ -1,5 +1,6 @@
 package com.booking.BookMyShow.service.Impl;
 
+import com.booking.BookMyShow.dtos.GeoPoint;
 import com.booking.BookMyShow.dtos.Theatre.*;
 import com.booking.BookMyShow.entity.City;
 import com.booking.BookMyShow.entity.Theatre;
@@ -7,6 +8,7 @@ import com.booking.BookMyShow.exception.ResourceAlreadyExistsException;
 import com.booking.BookMyShow.exception.ResourceNotFoundException;
 import com.booking.BookMyShow.repository.CityRepository;
 import com.booking.BookMyShow.repository.TheatreRepository;
+import com.booking.BookMyShow.service.GeocodingService;
 import com.booking.BookMyShow.service.TheatreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ public class TheatreServiceImpl implements TheatreService {
 
     private final TheatreRepository theatreRepository;
     private final CityRepository cityRepository;
+    private final GeocodingService geocodingService;
 
     @Override
     public TheatreResponseDto createTheatre(CreateTheatreRequest request) {
@@ -50,7 +53,13 @@ public class TheatreServiceImpl implements TheatreService {
                     "Theatre already exists in this city"
             );
         }
+
         String slug = generateSlug(request.getName(), city.getName());
+
+        // 🔥 AUTO GEOCODING
+        GeoPoint geoPoint = geocodingService.geocode(
+                request.getAddress() + ", " + city.getName()
+        );
 
         Theatre theatre = Theatre.builder()
                 .name(request.getName())
@@ -58,12 +67,13 @@ public class TheatreServiceImpl implements TheatreService {
                 .address(request.getAddress())
                 .contactNumber(request.getContactNumber())
                 .slug(slug)
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
+                .latitude(geoPoint.getLatitude())
+                .longitude(geoPoint.getLongitude())
                 .active(true)
                 .build();
 
         Theatre saved = theatreRepository.save(theatre);
+
         return mapToResponse(saved);
     }
 
@@ -71,29 +81,35 @@ public class TheatreServiceImpl implements TheatreService {
     @Override
     public TheatreResponseDto updateTheatre(Long theatreId, UpdateTheatreRequest request) {
 
-
         Theatre theatre = theatreRepository.findById(theatreId)
-                .orElseThrow(()-> new ResourceNotFoundException("Theatre not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Theatre not found"));
 
         if (request.getName() != null) {
             theatre.setName(request.getName());
         }
+
         if (request.getAddress() != null) {
             theatre.setAddress(request.getAddress());
+
+            // 🔥 Recalculate coordinates
+            GeoPoint geoPoint = geocodingService.geocode(
+                    request.getAddress() + ", " + theatre.getCity().getName()
+            );
+
+            theatre.setLatitude(geoPoint.getLatitude());
+            theatre.setLongitude(geoPoint.getLongitude());
         }
+
         if (request.getContactNumber() != null) {
             theatre.setContactNumber(request.getContactNumber());
         }
-        if (request.getLatitude() != null) {
-            theatre.setLatitude(request.getLatitude());
-        }
-        if (request.getLongitude() != null) {
-            theatre.setLongitude(request.getLongitude());
-        }
+
         if (request.getActive() != null) {
             theatre.setActive(request.getActive());
         }
+
         Theatre updated = theatreRepository.save(theatre);
+
         return mapToResponse(updated);
     }
 
