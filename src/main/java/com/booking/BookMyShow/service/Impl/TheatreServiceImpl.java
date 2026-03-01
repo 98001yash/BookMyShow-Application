@@ -97,12 +97,22 @@ public class TheatreServiceImpl implements TheatreService {
 
     @Override
     public void activateTheatre(Long theatreId) {
-
+        toggleStatus(theatreId, true);
     }
 
     @Override
     public void deactivateTheatre(Long theatreId) {
+        toggleStatus(theatreId, false);
+    }
 
+
+    private void toggleStatus(Long theatreId, boolean status) {
+
+        Theatre theatre = theatreRepository.findById(theatreId)
+                .orElseThrow(() -> new ResourceNotFoundException("Theatre not found"));
+
+        theatre.setActive(status);
+        theatreRepository.save(theatre);
     }
 
     @Override
