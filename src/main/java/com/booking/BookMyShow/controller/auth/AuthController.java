@@ -1,4 +1,4 @@
-package com.booking.BookMyShow.controller;
+package com.booking.BookMyShow.controller.auth;
 
 
 import com.booking.BookMyShow.dtos.AuthResponse;

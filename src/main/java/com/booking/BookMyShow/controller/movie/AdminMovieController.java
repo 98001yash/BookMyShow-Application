@@ -1,4 +1,4 @@
-package com.booking.BookMyShow.controller;
+package com.booking.BookMyShow.controller.movie;
 
 
 import com.booking.BookMyShow.dtos.Movies.CreateMovieRequest;
@@ -12,8 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin/movies")

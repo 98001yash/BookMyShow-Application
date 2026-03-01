@@ -1,10 +1,9 @@
-package com.booking.BookMyShow.controller;
+package com.booking.BookMyShow.controller.city;
 
 
 import com.booking.BookMyShow.advice.ApiResponse;
 import com.booking.BookMyShow.dtos.city.CityResponseDto;
 import com.booking.BookMyShow.dtos.city.CreateCityRequest;
-import com.booking.BookMyShow.dtos.city.PublicCityResponse;
 import com.booking.BookMyShow.service.CityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin/cities")

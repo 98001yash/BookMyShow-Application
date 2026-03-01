@@ -1,4 +1,4 @@
-package com.booking.BookMyShow.controller;
+package com.booking.BookMyShow.controller.city;
 
 
 import com.booking.BookMyShow.advice.ApiResponse;
