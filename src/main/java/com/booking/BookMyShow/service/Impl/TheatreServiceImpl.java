@@ -68,7 +68,31 @@ public class TheatreServiceImpl implements TheatreService {
 
     @Override
     public TheatreResponseDto updateTheatre(Long theatreId, UpdateTheatreRequest request) {
-        return null;
+
+
+        Theatre theatre = theatreRepository.findById(theatreId)
+                .orElseThrow(()-> new ResourceNotFoundException("Theatre not found"));
+
+        if (request.getName() != null) {
+            theatre.setName(request.getName());
+        }
+        if (request.getAddress() != null) {
+            theatre.setAddress(request.getAddress());
+        }
+        if (request.getContactNumber() != null) {
+            theatre.setContactNumber(request.getContactNumber());
+        }
+        if (request.getLatitude() != null) {
+            theatre.setLatitude(request.getLatitude());
+        }
+        if (request.getLongitude() != null) {
+            theatre.setLongitude(request.getLongitude());
+        }
+        if (request.getActive() != null) {
+            theatre.setActive(request.getActive());
+        }
+        Theatre updated = theatreRepository.save(theatre);
+        return mapToResponse(updated);
     }
 
     @Override
