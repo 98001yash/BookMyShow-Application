@@ -187,6 +187,7 @@ public class TheatreServiceImpl implements TheatreService {
         return TheatreResponseDto.builder()
                 .id(theatre.getId())
                 .name(theatre.getName())
+                .cityId(theatre.getCity().getId())
                 .cityName(theatre.getCity().getName())
                 .address(theatre.getAddress())
                 .contactNumber(theatre.getContactNumber())
