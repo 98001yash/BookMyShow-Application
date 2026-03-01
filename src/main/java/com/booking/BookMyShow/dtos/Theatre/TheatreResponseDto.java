@@ -24,6 +24,8 @@ public class TheatreResponseDto {
     private Double latitude;
     private Double longitude;
 
+    private String address;
+
     private Boolean active;
 
     private LocalDateTime createdAt;

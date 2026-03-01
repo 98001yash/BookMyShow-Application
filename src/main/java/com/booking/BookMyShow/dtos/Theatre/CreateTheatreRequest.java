@@ -18,7 +18,7 @@ public class CreateTheatreRequest {
     private String name;
 
     @NotNull
-    private String cityId;
+    private Long cityId;
 
     private String address;
 
