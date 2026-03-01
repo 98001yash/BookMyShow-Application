@@ -14,7 +14,11 @@ import com.booking.BookMyShow.service.TheatreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
 import java.util.List;
@@ -116,16 +120,34 @@ public class TheatreServiceImpl implements TheatreService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public TheatreResponseDto getTheatreBySlug(String slug) {
-        return null;
+        Theatre theatre = theatreRepository
+                .findBySlugAndActiveTrue(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Theatre not found"));
+
+        return mapToResponse(theatre);
     }
 
     @Override
-    public Page<TheatreSummaryResponse> getTheatresByCity(Long cityId, int page, int size, String sortBy, String direction) {
-        return null;
+    public Page<TheatreSummaryResponse> getTheatresByCity(Long cityId,
+                                                          int page,
+                                                          int size,
+                                                          String sortBy,
+                                                          String direction) {
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return theatreRepository
+                .findAllByCity_IdAndActiveTrue(cityId, pageable)
+                .map(this::mapToSummary);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TheatreSummaryResponse> getNearbyTheatres(double latitude, double longitude, double radius) {
         return List.of();
     }
