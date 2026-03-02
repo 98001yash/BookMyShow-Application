@@ -9,8 +9,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "show_seat_inventory",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_show_seat",
-                        columnNames = {"show_id", "seat_number"})
+                @UniqueConstraint(
+                        name = "uk_show_seat",
+                        columnNames = {"show_id", "seat_layout_id"}
+                )
         },
         indexes = {
                 @Index(name = "idx_inventory_show", columnList = "show_id"),
@@ -18,7 +20,9 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_inventory_show_status",
                         columnList = "show_id, status"),
                 @Index(name = "idx_inventory_locked_until",
-                        columnList = "lockedUntil")
+                        columnList = "lockedUntil"),
+                @Index(name = "idx_show_seat_layout",
+                        columnList = "show_id, seat_layout_id")
         })
 @Getter
 @Setter
@@ -31,8 +35,9 @@ public class ShowSeatInventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "seat_number", nullable = false)
-    private String seatNumber;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seat_layout_id", nullable = false)
+    private SeatLayout seatLayout;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
