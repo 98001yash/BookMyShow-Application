@@ -11,9 +11,12 @@ public interface ScreenRepository extends JpaRepository<Screen, Long> {
 
     boolean existsByTheatreAndNameIgnoreCase(Theatre theatre, String name);
 
-    boolean existByTheatreAndSlug(Theatre theatre, String slug);
+    boolean existsByTheatreAndSlug(Theatre theatre, String slug);
 
     Optional<Screen> findByTheatreAndSlug(Theatre theatre, String slug);
 
     List<Screen> findByTheatreAndIsActiveTrue(Theatre theatre);
+
+
+
 }

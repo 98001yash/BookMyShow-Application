@@ -63,4 +63,7 @@ public interface TheatreRepository extends JpaRepository<Theatre,Long> {
             @Param("lng") double longitude,
             @Param("radius") double radius
     );
+
+    Optional<Theatre> findBySlug(String theatreSlug);
+
 }

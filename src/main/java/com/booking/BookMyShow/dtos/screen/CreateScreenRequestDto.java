@@ -12,5 +12,5 @@ public class CreateScreenRequestDto {
     private String name;
     private ScreenType screenType;
     private Integer totalRows;
-    private Integer seatPerRow;   // needed to calculate totalSeats
+    private Integer seatsPerRow;   // needed to calculate totalSeats
 }
