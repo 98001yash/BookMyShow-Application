@@ -35,6 +35,7 @@ public class TheatreServiceImpl implements TheatreService {
     private final GeocodingService geocodingService;
 
     @Override
+    @Transactional
     public TheatreResponseDto createTheatre(CreateTheatreRequest request) {
 
         log.info("Creating theatre: {} in cityId: {}", request.getName(), request.getCityId());
@@ -61,14 +62,25 @@ public class TheatreServiceImpl implements TheatreService {
                 request.getAddress() + ", " + city.getName()
         );
 
+        Double latitude = null;
+        Double longitude = null;
+
+        if (geoPoint != null) {
+            latitude = geoPoint.getLatitude();
+            longitude = geoPoint.getLongitude();
+        } else {
+            log.warn("Geocoding failed for theatre: {}. Saving without coordinates.",
+                    request.getName());
+        }
+
         Theatre theatre = Theatre.builder()
                 .name(request.getName())
                 .city(city)
                 .address(request.getAddress())
                 .contactNumber(request.getContactNumber())
                 .slug(slug)
-                .latitude(geoPoint.getLatitude())
-                .longitude(geoPoint.getLongitude())
+                .latitude(latitude)
+                .longitude(longitude)
                 .active(true)
                 .build();
 
@@ -79,6 +91,7 @@ public class TheatreServiceImpl implements TheatreService {
 
 
     @Override
+    @Transactional
     public TheatreResponseDto updateTheatre(Long theatreId, UpdateTheatreRequest request) {
 
         Theatre theatre = theatreRepository.findById(theatreId)
@@ -91,13 +104,16 @@ public class TheatreServiceImpl implements TheatreService {
         if (request.getAddress() != null) {
             theatre.setAddress(request.getAddress());
 
-            // 🔥 Recalculate coordinates
             GeoPoint geoPoint = geocodingService.geocode(
                     request.getAddress() + ", " + theatre.getCity().getName()
             );
 
-            theatre.setLatitude(geoPoint.getLatitude());
-            theatre.setLongitude(geoPoint.getLongitude());
+            if (geoPoint != null) {
+                theatre.setLatitude(geoPoint.getLatitude());
+                theatre.setLongitude(geoPoint.getLongitude());
+            } else {
+                log.warn("Geocoding failed during update for theatreId: {}", theatreId);
+            }
         }
 
         if (request.getContactNumber() != null) {
