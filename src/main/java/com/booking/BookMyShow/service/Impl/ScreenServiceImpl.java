@@ -91,18 +91,84 @@ public class ScreenServiceImpl implements ScreenService {
     }
 
     @Override
-    public ScreenResponseDto updateScreen(String theatreSlug, String screenSlug, CreateScreenRequestDto request) {
-        return null;
+    @Transactional
+    public ScreenResponseDto updateScreen(String theatreSlug,
+                                          String screenSlug,
+                                          CreateScreenRequestDto request) {
+
+        log.info("Updating screen '{}' for theatre '{}'", screenSlug, theatreSlug);
+
+        Theatre theatre = theatreRepository.findBySlug(theatreSlug)
+                .orElseThrow(() -> {
+                    log.error("Theatre not found: {}", theatreSlug);
+                    return new ResourceNotFoundException("Theatre not found");
+                });
+
+        Screen screen = screenRepository.findByTheatreAndSlug(theatre, screenSlug)
+                .orElseThrow(() -> {
+                    log.error("Screen not found: {} in theatre {}", screenSlug, theatreSlug);
+                    return new ResourceNotFoundException("Screen not found");
+                });
+
+        if (request.getTotalRows() != null &&
+                !request.getTotalRows().equals(screen.getTotalRows())) {
+
+            log.warn("Attempt to modify totalRows for screen ID {}", screen.getId());
+            throw new RuntimeException("Seat layout modification not allowed after creation");
+        }
+
+        if (request.getName() != null &&
+                !request.getName().equalsIgnoreCase(screen.getName())) {
+
+            if (screenRepository.existsByTheatreAndNameIgnoreCase(theatre, request.getName())) {
+                log.warn("Duplicate screen name '{}' in theatre '{}'",
+                        request.getName(), theatreSlug);
+                throw new RuntimeException("Screen name already exists in this theatre");
+            }
+
+            screen.setName(request.getName());
+
+            String newSlug = generateSlug(request.getName());
+
+            if (screenRepository.existsByTheatreAndSlug(theatre, newSlug)) {
+                throw new RuntimeException("Screen slug conflict. Try different name.");
+            }
+
+            screen.setSlug(newSlug);
+        }
+
+        if (request.getScreenType() != null) {
+            screen.setScreenType(request.getScreenType());
+        }
+
+        screen.setUpdatedAt(LocalDateTime.now());
+
+        log.info("Screen '{}' updated successfully", screen.getSlug());
+
+        return mapToResponse(screen);
     }
 
     @Override
+    @Transactional
     public void activateScreen(String theatreSlug, String screenSlug) {
 
+        Screen screen = getScreenOrThrow(theatreSlug, screenSlug);
+
+        screen.setIsActive(true);
+        screen.setUpdatedAt(LocalDateTime.now());
+
+        log.info("Activated screen '{}' in theatre '{}'", screenSlug, theatreSlug);
     }
 
     @Override
     public void deactivateScreen(String theatreSlug, String screenSlug) {
 
+        Screen screen = getScreenOrThrow(theatreSlug, screenSlug);
+
+        screen.setIsActive(false);
+        screen.setUpdatedAt(LocalDateTime.now());
+
+        log.info("Deactivated screen '{}' in theatre '{}'", screenSlug, theatreSlug);
     }
 
     @Override
@@ -119,7 +185,23 @@ public class ScreenServiceImpl implements ScreenService {
 
     @Override
     public List<ScreenResponseDto> getAllScreensForAdmin(String theatreSlug) {
-        return List.of();
+
+        Theatre theatre = theatreRepository.findBySlug(theatreSlug)
+                .orElseThrow(()->new ResourceNotFoundException("Theatre not found"));
+
+        return screenRepository.findAll()
+                .stream()
+                .filter(screen->screen.getTheatre().getId().equals(theatre.getId()))
+                .map(this::mapToResponse)
+                .toList();
+    }
+    private Screen getScreenOrThrow(String theatreSlug, String screenSlug) {
+
+        Theatre theatre = theatreRepository.findBySlug(theatreSlug)
+                .orElseThrow(() -> new ResourceNotFoundException("Theatre not found"));
+
+        return screenRepository.findByTheatreAndSlug(theatre, screenSlug)
+                .orElseThrow(() -> new ResourceNotFoundException("Screen not found"));
     }
 
 
