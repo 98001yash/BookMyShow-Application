@@ -107,7 +107,14 @@ public class ScreenServiceImpl implements ScreenService {
 
     @Override
     public List<ScreenResponseDto> getActiveScreens(String theatreSlug) {
-        return List.of();
+
+        Theatre theatre = theatreRepository.findBySlug(theatreSlug)
+                .orElseThrow(()->new ResourceNotFoundException("Theatre not found"));
+
+        return screenRepository.findByTheatreAndIsActiveTrue(theatre)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
