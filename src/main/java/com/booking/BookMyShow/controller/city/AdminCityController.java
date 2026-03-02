@@ -27,7 +27,7 @@ public class AdminCityController {
     ) {
         log.info("Admin API: Create City");
         CityResponseDto response = cityService.createCity(request);
-        return ApiResponse.success(response);
+        return ApiResponse.success(response, response);
     }
 
     // -----------------------------------
@@ -37,7 +37,7 @@ public class AdminCityController {
     ) {
         log.info("Admin API: Get City By ID: {}", id);
         CityResponseDto response = cityService.getCityById(id);
-        return ApiResponse.success(response);
+        return ApiResponse.success(response, response);
     }
 
 
@@ -52,7 +52,7 @@ public class AdminCityController {
 
         Page<CityResponseDto> response =
                 cityService.getAllCities(page, size, sortBy, direction);
-        return ApiResponse.success(response);
+        return ApiResponse.success(response, response);
     }
 
 
@@ -62,7 +62,7 @@ public class AdminCityController {
     ) {
         log.info("Admin API: Activate City: {}", id);
         cityService.activateCity(id);
-        return ApiResponse.success("City activated successfully");
+        return ApiResponse.success("City activated successfully", response);
     }
 
     @PutMapping("/{id}/deactivate")
@@ -71,7 +71,7 @@ public class AdminCityController {
     ) {
         log.info("Admin API: Deactivate City: {}", id);
         cityService.deactivateCity(id);
-        return ApiResponse.success("City deactivated successfully");
+        return ApiResponse.success("City deactivated successfully", response);
     }
 
 }

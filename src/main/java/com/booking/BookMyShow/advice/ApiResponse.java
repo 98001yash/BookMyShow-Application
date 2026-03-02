@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Data
 @Builder
@@ -14,35 +13,44 @@ public class ApiResponse<T> {
 
     private Instant timestamp;
     private String traceId;
+    private boolean success;
+    private String message;
     private T data;
     private ApiError error;
 
-    // -----------------------------
+    // --------------------------------------------------
     // SUCCESS RESPONSE
-    // -----------------------------
-    public static <T> ApiResponse<T> success(T data) {
+    // --------------------------------------------------
+    public static <T> ApiResponse<T> success(T data, String traceId) {
         return ApiResponse.<T>builder()
                 .timestamp(Instant.now())
-                .traceId(generateTraceId())
+                .traceId(traceId)
+                .success(true)
+                .message("Request processed successfully")
                 .data(data)
                 .build();
     }
 
-    // -----------------------------
-    // FAILURE RESPONSE
-    // -----------------------------
-    public static <T> ApiResponse<T> failure(ApiError error, String traceId) {
+    public static <T> ApiResponse<T> success(String message, T data, String traceId) {
         return ApiResponse.<T>builder()
                 .timestamp(Instant.now())
-                .traceId(generateTraceId())
-                .error(error)
+                .traceId(traceId)
+                .success(true)
+                .message(message)
+                .data(data)
                 .build();
     }
 
-    // -----------------------------
-    // TRACE ID GENERATOR
-    // -----------------------------
-    private static String generateTraceId() {
-        return UUID.randomUUID().toString();
+    // --------------------------------------------------
+    // FAILURE RESPONSE
+    // --------------------------------------------------
+    public static <T> ApiResponse<T> failure(ApiError error, String traceId) {
+        return ApiResponse.<T>builder()
+                .timestamp(Instant.now())
+                .traceId(traceId)
+                .success(false)
+                .message(error.getMessage())
+                .error(error)
+                .build();
     }
 }

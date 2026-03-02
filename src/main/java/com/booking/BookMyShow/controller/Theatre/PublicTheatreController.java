@@ -37,8 +37,8 @@ public class PublicTheatreController {
                         size,
                         sortBy,
                         direction
-                )
-        );
+                ),
+                response);
     }
 
 
@@ -54,7 +54,7 @@ public class PublicTheatreController {
                         lat,
                         lng,
                         radius
-                )
-        );
+                ),
+                response);
     }
 }

@@ -25,8 +25,8 @@ public class PublicCityController {
         log.info("Public API: Fetching active cities");
 
         return ApiResponse.success(
-                cityService.getActiveCities()
-        );
+                cityService.getActiveCities(),
+                response);
     }
 
     @GetMapping("/{slug}")
@@ -36,7 +36,7 @@ public class PublicCityController {
         log.info("Public API: Fetching city by slug: {}", slug);
 
         return ApiResponse.success(
-                cityService.getCityBySlug(slug)
-        );
+                cityService.getCityBySlug(slug),
+                response);
     }
 }

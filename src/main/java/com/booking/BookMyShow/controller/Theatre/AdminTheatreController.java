@@ -29,8 +29,8 @@ public class AdminTheatreController {
     ) {
         log.info("Admin creating theatre: {}", request.getName());
         return ApiResponse.success(
-                theatreService.createTheatre(request)
-        );
+                theatreService.createTheatre(request),
+                response);
     }
 
 
@@ -41,22 +41,22 @@ public class AdminTheatreController {
     ) {
         log.info("Admin updating theatre id: {}", id);
         return ApiResponse.success(
-                theatreService.updateTheatre(id, request)
-        );
+                theatreService.updateTheatre(id, request),
+                response);
     }
 
 
     @PatchMapping("/{id}/activate")
     public ApiResponse<String> activate(@PathVariable Long id) {
         theatreService.activateTheatre(id);
-        return ApiResponse.success("Theatre activated successfully");
+        return ApiResponse.success("Theatre activated successfully", response);
     }
 
 
     @PatchMapping("/{id}/deactivate")
     public ApiResponse<String> deactivate(@PathVariable Long id) {
         theatreService.deactivateTheatre(id);
-        return ApiResponse.success("Theatre deactivated successfully");
+        return ApiResponse.success("Theatre deactivated successfully", response);
     }
 
 
@@ -65,8 +65,8 @@ public class AdminTheatreController {
             @PathVariable String slug
     ) {
         return ApiResponse.success(
-                theatreService.getTheatreBySlug(slug)
-        );
+                theatreService.getTheatreBySlug(slug),
+                response);
     }
 
 
@@ -86,7 +86,7 @@ public class AdminTheatreController {
                         size,
                         sortBy,
                         direction
-                )
-        );
+                ),
+                response);
     }
 }
