@@ -1,6 +1,5 @@
 package com.booking.BookMyShow.controller.Theatre;
 
-import com.booking.BookMyShow.advice.ApiResponse;
 import com.booking.BookMyShow.dtos.Theatre.CreateTheatreRequest;
 import com.booking.BookMyShow.dtos.Theatre.TheatreResponseDto;
 import com.booking.BookMyShow.dtos.Theatre.TheatreSummaryResponse;
@@ -22,56 +21,45 @@ public class AdminTheatreController {
 
     private final TheatreService theatreService;
 
-
     @PostMapping
-    public ApiResponse<TheatreResponseDto> createTheatre(
+    public TheatreResponseDto createTheatre(
             @Valid @RequestBody CreateTheatreRequest request
     ) {
         log.info("Admin creating theatre: {}", request.getName());
-        return ApiResponse.success(
-                theatreService.createTheatre(request),
-                response);
+        return theatreService.createTheatre(request);
     }
 
-
     @PutMapping("/{id}")
-    public ApiResponse<TheatreResponseDto> updateTheatre(
+    public TheatreResponseDto updateTheatre(
             @PathVariable Long id,
             @RequestBody UpdateTheatreRequest request
     ) {
         log.info("Admin updating theatre id: {}", id);
-        return ApiResponse.success(
-                theatreService.updateTheatre(id, request),
-                response);
+        return theatreService.updateTheatre(id, request);
     }
-
 
     @PatchMapping("/{id}/activate")
-    public ApiResponse<String> activate(@PathVariable Long id) {
+    public void activate(@PathVariable Long id) {
+        log.info("Admin activating theatre id: {}", id);
         theatreService.activateTheatre(id);
-        return ApiResponse.success("Theatre activated successfully", response);
     }
-
 
     @PatchMapping("/{id}/deactivate")
-    public ApiResponse<String> deactivate(@PathVariable Long id) {
+    public void deactivate(@PathVariable Long id) {
+        log.info("Admin deactivating theatre id: {}", id);
         theatreService.deactivateTheatre(id);
-        return ApiResponse.success("Theatre deactivated successfully", response);
     }
-
 
     @GetMapping("/slug/{slug}")
-    public ApiResponse<TheatreResponseDto> getBySlug(
+    public TheatreResponseDto getBySlug(
             @PathVariable String slug
     ) {
-        return ApiResponse.success(
-                theatreService.getTheatreBySlug(slug),
-                response);
+        log.info("Admin fetching theatre by slug: {}", slug);
+        return theatreService.getTheatreBySlug(slug);
     }
 
-
     @GetMapping
-    public ApiResponse<Page<TheatreSummaryResponse>> getTheatresByCity(
+    public Page<TheatreSummaryResponse> getTheatresByCity(
             @RequestParam Long cityId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -79,14 +67,14 @@ public class AdminTheatreController {
             @RequestParam(defaultValue = "desc") String direction
     ) {
 
-        return ApiResponse.success(
-                theatreService.getTheatresByCity(
-                        cityId,
-                        page,
-                        size,
-                        sortBy,
-                        direction
-                ),
-                response);
+        log.info("Admin fetching theatres by cityId: {}", cityId);
+
+        return theatreService.getTheatresByCity(
+                cityId,
+                page,
+                size,
+                sortBy,
+                direction
+        );
     }
 }

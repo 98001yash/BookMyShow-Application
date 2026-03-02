@@ -1,7 +1,5 @@
 package com.booking.BookMyShow.controller.city;
 
-
-import com.booking.BookMyShow.advice.ApiResponse;
 import com.booking.BookMyShow.dtos.city.PublicCityResponse;
 import com.booking.BookMyShow.service.CityService;
 import lombok.RequiredArgsConstructor;
@@ -18,25 +16,20 @@ public class PublicCityController {
 
     private final CityService cityService;
 
-
     @GetMapping
-    public ApiResponse<List<PublicCityResponse>> getActiveCities() {
+    public List<PublicCityResponse> getActiveCities() {
 
         log.info("Public API: Fetching active cities");
 
-        return ApiResponse.success(
-                cityService.getActiveCities(),
-                response);
+        return cityService.getActiveCities();
     }
 
     @GetMapping("/{slug}")
-    public ApiResponse<PublicCityResponse> getCityBySlug(
+    public PublicCityResponse getCityBySlug(
             @PathVariable String slug
     ) {
         log.info("Public API: Fetching city by slug: {}", slug);
 
-        return ApiResponse.success(
-                cityService.getCityBySlug(slug),
-                response);
+        return cityService.getCityBySlug(slug);
     }
 }
