@@ -19,8 +19,8 @@ public class ShowResponseDto {
 
     private String movieTitle;
 
-    private String screeName;
-    private String screeSlug;
+    private String screenName;
+    private String screenSlug;
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
