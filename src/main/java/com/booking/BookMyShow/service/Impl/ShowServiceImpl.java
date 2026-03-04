@@ -84,4 +84,21 @@ public class ShowServiceImpl implements ShowService {
                 .pricing(pricingDtos)
                 .build();
     }
+
+
+    private ShowResponseDto mapShowOnly(Show show) {
+
+        return ShowResponseDto.builder()
+                .id(show.getId())
+                .movieId(show.getMovie().getId())
+                .movieTitle(show.getMovie().getTitle())
+                .screenName(show.getScreen().getName())
+                .screenSlug(show.getScreen().getSlug())
+                .startTime(show.getStartTime())
+                .endTime(show.getEndTime())
+                .language(show.getLanguage())
+                .format(show.getFormat())
+                .isActive(show.getIsActive())
+                .build();
+    }
 }
