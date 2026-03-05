@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SeaLockRequest {
+public class SeatLockRequest {
 
     @NotEmpty
     private List<String> seatNumbers;
