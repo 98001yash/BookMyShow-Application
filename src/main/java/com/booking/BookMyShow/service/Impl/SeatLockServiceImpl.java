@@ -27,6 +27,7 @@ public class SeatLockServiceImpl implements SeatLockService {
 
     // Lock seats for booking
     @Override
+    @Transactional
     public SeatLockResponse lockSeats(Long showId, SeatLockRequest request) {
 
 
@@ -69,6 +70,7 @@ public class SeatLockServiceImpl implements SeatLockService {
 
     // unlock seats (manual releases)
     @Override
+    @Transactional
     public void unlockSeats(Long showId, List<String> seatNumbers) {
 
         for (String seatNumber : seatNumbers) {
