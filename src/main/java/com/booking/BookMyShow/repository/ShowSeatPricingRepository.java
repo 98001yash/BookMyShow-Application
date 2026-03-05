@@ -1,5 +1,6 @@
 package com.booking.BookMyShow.repository;
 
+import com.booking.BookMyShow.entity.Show;
 import com.booking.BookMyShow.entity.ShowSeatPricing;
 import com.booking.BookMyShow.enums.SeatTier;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +12,6 @@ public interface ShowSeatPricingRepository extends JpaRepository<ShowSeatPricing
 
     List<ShowSeatPricing> findByShowId(Long showId);
 
-    Optional<ShowSeatPricing> findByShowIdAndTier(Long showId, SeatTier tier);
+    Optional<ShowSeatPricing> findByShowAndTier(Show show, SeatTier tier);
+
 }
