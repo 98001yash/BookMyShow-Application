@@ -1,4 +1,4 @@
-package com.booking.BookMyShow.dtos.city.Booking;
+package com.booking.BookMyShow.dtos.Booking;
 
 import lombok.Builder;
 import lombok.Data;

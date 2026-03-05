@@ -1,7 +1,7 @@
 package com.booking.BookMyShow.service;
 
-import com.booking.BookMyShow.dtos.city.Booking.BookingResponse;
-import com.booking.BookMyShow.dtos.city.Booking.CreateBookingRequest;
+import com.booking.BookMyShow.dtos.Booking.BookingResponse;
+import com.booking.BookMyShow.dtos.Booking.CreateBookingRequest;
 
 public interface BookingService {
 

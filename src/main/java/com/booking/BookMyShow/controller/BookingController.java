@@ -1,8 +1,8 @@
 package com.booking.BookMyShow.controller;
 
 import com.booking.BookMyShow.advice.ApiResponse;
-import com.booking.BookMyShow.dtos.city.Booking.BookingResponse;
-import com.booking.BookMyShow.dtos.city.Booking.CreateBookingRequest;
+import com.booking.BookMyShow.dtos.Booking.BookingResponse;
+import com.booking.BookMyShow.dtos.Booking.CreateBookingRequest;
 import com.booking.BookMyShow.service.BookingService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,6 @@ public class BookingController {
                 "Booking created successfully"
         );
     }
-
 
     @GetMapping("/{reference}")
     public ApiResponse<BookingResponse> getBooking(

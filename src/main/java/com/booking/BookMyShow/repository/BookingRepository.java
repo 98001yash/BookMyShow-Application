@@ -13,4 +13,6 @@ public interface BookingRepository
     Optional<Booking> findByBookingReference(String bookingReference);
 
     List<Booking> findByUserId(Long userId);
+
+    Optional<Booking> findByIdempotencyKey(String idempotencyKey);
 }

@@ -25,6 +25,9 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "idempotency_key", nullable = false, unique = true)
+    private String idempotencyKey;
+
     @Column(name = "booking_reference", unique = true, nullable = false)
     private String bookingReference;
 

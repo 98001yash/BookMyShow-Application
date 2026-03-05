@@ -1,7 +1,7 @@
 package com.booking.BookMyShow.service.Impl;
 
-import com.booking.BookMyShow.dtos.city.Booking.BookingResponse;
-import com.booking.BookMyShow.dtos.city.Booking.CreateBookingRequest;
+import com.booking.BookMyShow.dtos.Booking.BookingResponse;
+import com.booking.BookMyShow.dtos.Booking.CreateBookingRequest;
 import com.booking.BookMyShow.entity.*;
 import com.booking.BookMyShow.enums.BookingStatus;
 import com.booking.BookMyShow.enums.SeatStatus;
@@ -37,10 +37,18 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingResponse createBooking(CreateBookingRequest request) {
 
-        log.info("Creating booking for show={} seats={}",
+        log.info("Creating booking for showId={} seats={} idempotencyKey={}",
                 request.getShowId(),
-                request.getSeatNumbers());
+                request.getSeatNumbers(),
+                request.getIdempotencyKey());
 
+        // 1️ Idempotency protection
+        bookingRepository.findByIdempotencyKey(request.getIdempotencyKey())
+                .ifPresent(existing -> {
+                    throw new RuntimeException("Duplicate booking request with same idempotency key");
+                });
+
+        // 2️ Fetch show
         Show show = showRepository.findById(request.getShowId())
                 .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
 
@@ -50,16 +58,16 @@ public class BookingServiceImpl implements BookingService {
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
+        // 3️ Validate seats + calculate pricing
         for (String seatNumber : seatNumbers) {
 
             ShowSeatInventory seat = inventoryRepository
-                    .findByShowIdAndSeatLayout_SeatNumber(
+                    .findWithLockByShowIdAndSeatLayout_SeatNumber(
                             request.getShowId(),
                             seatNumber
                     )
                     .orElseThrow(() ->
-                            new ResourceNotFoundException(
-                                    "Seat not found: " + seatNumber));
+                            new ResourceNotFoundException("Seat not found: " + seatNumber));
 
             if (seat.getStatus() != SeatStatus.LOCKED) {
                 throw new RuntimeException("Seat not locked: " + seatNumber);
@@ -72,18 +80,20 @@ public class BookingServiceImpl implements BookingService {
             ShowSeatPricing pricing = pricingRepository
                     .findByShowAndTier(show, tier)
                     .orElseThrow(() ->
-                            new RuntimeException(
-                                    "Pricing not found for tier " + tier));
+                            new RuntimeException("Pricing not found for tier " + tier));
 
             totalAmount = totalAmount.add(pricing.getPrice());
         }
 
+        // 4️Generate booking reference
         String bookingReference = BookingReferenceGenerator.generate();
 
+        // ⃣ Create booking
         Booking booking = Booking.builder()
                 .bookingReference(bookingReference)
+                .idempotencyKey(request.getIdempotencyKey())
                 .show(show)
-                .userId(1L) // Replace with authenticated user later
+                .userId(request.getUserId())
                 .status(BookingStatus.SEATS_LOCKED)
                 .totalAmount(totalAmount.doubleValue())
                 .createdAt(LocalDateTime.now())
@@ -92,6 +102,9 @@ public class BookingServiceImpl implements BookingService {
 
         bookingRepository.save(booking);
 
+        log.info("Booking created with reference={}", bookingReference);
+
+        // 6️ Save booking seats
         List<BookingSeat> bookingSeats = new ArrayList<>();
 
         for (ShowSeatInventory seat : lockedSeats) {
@@ -101,8 +114,7 @@ public class BookingServiceImpl implements BookingService {
             ShowSeatPricing pricing = pricingRepository
                     .findByShowAndTier(show, tier)
                     .orElseThrow(() ->
-                            new RuntimeException(
-                                    "Pricing not found for tier " + tier));
+                            new RuntimeException("Pricing not found for tier " + tier));
 
             BookingSeat bookingSeat = BookingSeat.builder()
                     .booking(booking)
@@ -115,13 +127,17 @@ public class BookingServiceImpl implements BookingService {
 
         bookingSeatRepository.saveAll(bookingSeats);
 
+        // 7️ Move booking to payment stage
         booking.setStatus(BookingStatus.PAYMENT_PENDING);
+        booking.setUpdatedAt(LocalDateTime.now());
+
         bookingRepository.save(booking);
 
-        log.info("Booking created reference={} amount={}",
+        log.info("Booking ready for payment reference={} totalAmount={}",
                 bookingReference,
                 totalAmount);
 
+        // 8️ Response
         return BookingResponse.builder()
                 .bookingId(booking.getId())
                 .bookingReference(bookingReference)
