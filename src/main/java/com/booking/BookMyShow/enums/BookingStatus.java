@@ -38,6 +38,21 @@ public enum BookingStatus {
     }
 
     public boolean isTerminal() {
-        return this == EXPIRED || this == REFUNDED || this == COMPLETED;
+        return this == EXPIRED
+                || this == REFUNDED
+                || this == COMPLETED
+                || this == CANCELLED;
+    }
+
+    public boolean isPaymentRequired() {
+        return this == SEATS_LOCKED || this == PAYMENT_PENDING;
+    }
+
+    public boolean isActive() {
+        return !(this == CANCELLED || this == EXPIRED || this == REFUNDED);
+    }
+
+    public boolean isConfirmed() {
+        return this == CONFIRMED || this == COMPLETED;
     }
 }
