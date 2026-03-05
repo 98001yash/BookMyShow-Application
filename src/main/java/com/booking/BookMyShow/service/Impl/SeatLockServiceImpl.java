@@ -118,6 +118,10 @@ public class SeatLockServiceImpl implements SeatLockService {
     @Transactional
     public void releaseExpiredLocks() {
 
+
+        int released = inventoryRepository.releaseExpiredLocks(LocalDateTime.now());
+        log.info("Released {} expired seat locks", released);
+
         List<ShowSeatInventory> expiredLocks =
                 inventoryRepository.findByStatusAndLockedUntilBefore(
                         SeatStatus.LOCKED,

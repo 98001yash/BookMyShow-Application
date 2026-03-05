@@ -5,6 +5,8 @@ import com.booking.BookMyShow.enums.SeatStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,5 +40,15 @@ public interface ShowSeatInventoryRepository
     );
 
     List<ShowSeatInventory> findByShowId(Long showId);
+
+
+    @Modifying
+    @Query("""
+UPDATE ShowSeatInventory s
+SET s.status = 'AVAILABLE', s.lockedUntil = null
+WHERE s.status = 'LOCKED'
+AND s.lockedUntil < :time
+""")
+    int releaseExpiredLocks(LocalDateTime time);
 
 }
