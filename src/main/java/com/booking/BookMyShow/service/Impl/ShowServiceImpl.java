@@ -108,28 +108,66 @@ public class ShowServiceImpl implements ShowService {
 
     @Override
     public ShowResponseDto getShowById(Long showId) {
-        return null;
+
+        Show show = showRepository.findById(showId)
+                .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
+
+        List<ShowSeatPricing> pricing =
+                pricingRepository.findByShowId(showId);
+
+        return mapToResponse(show, pricing);
     }
 
     @Override
     public List<ShowResponseDto> getShowsByMovie(Long movieId) {
-        return List.of();
+
+        List<Show> shows = showRepository.findByMovieIdAndIsActiveTrue(movieId);
+
+        return shows.stream()
+                .map(this::mapShowOnly)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<ShowResponseDto> getShowsByScreen(Long screenId) {
-        return List.of();
+
+        List<Show> shows =
+                showRepository.findByScreenIdAndIsActiveTrue(screenId);
+
+        return shows.stream()
+                .map(this::mapShowOnly)
+                .collect(Collectors.toList());
     }
 
+
+
     @Override
+    @Transactional
     public void activateShow(Long showId) {
 
+        Show show = showRepository.findById(showId)
+                .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
+
+        show.setIsActive(true);
+        show.setUpdatedAt(LocalDateTime.now());
+
+        log.info("Show {} activated", showId);
     }
+
 
     @Override
+    @Transactional
     public void deactivateShow(Long showId) {
 
+        Show show = showRepository.findById(showId)
+                .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
+
+        show.setIsActive(false);
+        show.setUpdatedAt(LocalDateTime.now());
+
+        log.info("Show {} deactivated", showId);
     }
+
 
     private ShowResponseDto mapToResponse(
             Show show,
