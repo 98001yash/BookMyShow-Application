@@ -10,10 +10,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "bookings",
         indexes = {
-                @Index(name = "idx_booking_user", columnList = "userId"),
+                @Index(name = "idx_booking_user", columnList = "user_id"),
                 @Index(name = "idx_booking_show", columnList = "show_id"),
-                @Index(name = "idx_booking_status", columnList = "status"),
-                @Index(name = "idx_booking_created", columnList = "createdAt")
+                @Index(name = "idx_booking_status", columnList = "status")
         })
 @Getter
 @Setter
@@ -26,26 +25,26 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "booking_reference", unique = true, nullable = false)
+    private String bookingReference;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "show_id", nullable = false)
+    private Show show;
+
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BookingStatus status;
 
-    @Column(nullable = false)
-    private BigDecimal totalAmount;
-
-    @Column(nullable = false, unique = true)
-    private String idempotencyKey;
+    @Column(name = "total_amount", nullable = false)
+    private Double totalAmount;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Version
-    private Long version;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "show_id", nullable = false)
-    private Show show;
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 }
