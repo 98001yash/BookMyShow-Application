@@ -93,6 +93,7 @@ public class ShowServiceImpl implements ShowService {
                 .map(layout -> ShowSeatInventory.builder()
                         .show(show)
                         .seatLayout(layout)
+                        .seatNumber(layout.getSeatNumber())
                         .status(SeatStatus.AVAILABLE)
                         .build())
                 .collect(Collectors.toList());

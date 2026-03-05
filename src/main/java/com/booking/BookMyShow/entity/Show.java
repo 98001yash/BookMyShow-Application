@@ -52,7 +52,7 @@ public class Show {
     @Column(nullable = false)
     private String language;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "active", nullable = false)
     private Boolean isActive;
 
     @Column(name = "created_at", nullable = false)

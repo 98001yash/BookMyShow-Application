@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_show_seat",
-                        columnNames = {"show_id", "seat_layout_id"}
+                        columnNames = {"show_id", "seat_number"}
                 )
         },
         indexes = {
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_inventory_show_status",
                         columnList = "show_id, status"),
                 @Index(name = "idx_inventory_locked_until",
-                        columnList = "lockedUntil"),
+                        columnList = "locked_until"),
                 @Index(name = "idx_show_seat_layout",
                         columnList = "show_id, seat_layout_id")
         })
@@ -35,6 +35,9 @@ public class ShowSeatInventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "seat_number", nullable = false)
+    private String seatNumber;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seat_layout_id", nullable = false)
     private SeatLayout seatLayout;
@@ -43,6 +46,7 @@ public class ShowSeatInventory {
     @Column(nullable = false)
     private SeatStatus status;
 
+    @Column(name = "locked_until")
     private LocalDateTime lockedUntil;
 
     @Version

@@ -31,6 +31,7 @@ public class ShowAdminController {
         return showService.createShow(request);
     }
 
+    @GetMapping("/{showId}")
     public ShowResponseDto getShowById(
             @PathVariable Long showId
     ){
