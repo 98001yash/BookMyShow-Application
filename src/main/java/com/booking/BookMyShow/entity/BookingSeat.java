@@ -6,9 +6,7 @@ import lombok.*;
 @Entity
 @Table(name = "booking_seats",
         indexes = {
-                @Index(name = "idx_booking_seat_booking", columnList = "booking_id"),
-                @Index(name = "idx_booking_seat_show_seat",
-                        columnList = "showSeatInventory_id")
+                @Index(name = "idx_booking_seat_booking", columnList = "booking_id")
         })
 @Getter
 @Setter
@@ -26,6 +24,9 @@ public class BookingSeat {
     private Booking booking;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "showSeatInventory_id", nullable = false)
+    @JoinColumn(name = "show_seat_inventory_id", nullable = false)
     private ShowSeatInventory showSeatInventory;
+
+    @Column(nullable = false)
+    private Double price;
 }
