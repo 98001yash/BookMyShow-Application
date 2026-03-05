@@ -36,4 +36,7 @@ public interface ShowSeatInventoryRepository
             Long showId,
             String seatNumber
     );
+
+    List<ShowSeatInventory> findByShowId(Long showId);
+
 }

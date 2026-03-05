@@ -10,6 +10,7 @@ import com.booking.BookMyShow.service.SeatLockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class SeatLockServiceImpl implements SeatLockService {
     private static final int LOCK_DURATION_MINUTES = 5;
 
 
+    // Lock seats for booking
     @Override
     public SeatLockResponse lockSeats(Long showId, SeatLockRequest request) {
 
@@ -64,18 +66,68 @@ public class SeatLockServiceImpl implements SeatLockService {
                 .build();
     }
 
+
+    // unlock seats (manual releases)
     @Override
     public void unlockSeats(Long showId, List<String> seatNumbers) {
 
+        for (String seatNumber : seatNumbers) {
+
+            ShowSeatInventory inventory = inventoryRepository
+                    .findWithLockByShowIdAndSeatLayout_SeatNumber(showId, seatNumber)
+                    .orElseThrow(() ->
+                            new RuntimeException("Seat not found: " + seatNumber));
+
+            if (inventory.getStatus() == SeatStatus.LOCKED) {
+
+                inventory.setStatus(SeatStatus.AVAILABLE);
+                inventory.setLockedUntil(null);
+            }
+        }
+
+        log.info("Seats unlocked for show {} seats={}", showId, seatNumbers);
     }
 
+
+    // fetch seat map
     @Override
     public List<SeatStatusResponse> getSeatMap(Long showId) {
-        return List.of();
+
+        List<ShowSeatInventory> seats =
+                inventoryRepository.findByShowId(showId);
+
+        List<SeatStatusResponse> response = new ArrayList<>();
+
+        for (ShowSeatInventory seat : seats) {
+
+            response.add(
+                    SeatStatusResponse.builder()
+                            .seatNumber(seat.getSeatLayout().getSeatNumber())
+                            .status(seat.getStatus())
+                            .build()
+            );
+        }
+
+        return response;
     }
 
+    // release expired seat lccks
     @Override
+    @Transactional
     public void releaseExpiredLocks() {
 
+        List<ShowSeatInventory> expiredLocks =
+                inventoryRepository.findByStatusAndLockedUntilBefore(
+                        SeatStatus.LOCKED,
+                        LocalDateTime.now()
+                );
+
+        for (ShowSeatInventory seat : expiredLocks) {
+
+            seat.setStatus(SeatStatus.AVAILABLE);
+            seat.setLockedUntil(null);
+        }
+
+        log.info("Released {} expired seat locks", expiredLocks.size());
     }
 }
