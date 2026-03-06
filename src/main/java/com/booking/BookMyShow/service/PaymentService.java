@@ -23,6 +23,7 @@ public class PaymentService {
 
     private final RazorpayClient razorpayClient;
     private final BookingRepository bookingRepository;
+    private final SeatLockService seatLockService;
 
     @Value("${razorpay.key-secret}")
     private String razorpaySecret;
@@ -50,21 +51,32 @@ public class PaymentService {
 
 
     }
-        public void verifyPayment(PaymentVerifyRequest request) {
+    public void verifyPayment(PaymentVerifyRequest request) {
 
-            Booking booking = bookingRepository
-                    .findByBookingReference(request.getBookingReference())
-                    .orElseThrow(() -> new RuntimeException("Booking not found"));
+        Booking booking = bookingRepository
+                .findByBookingReference(request.getBookingReference())
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-            String payload = request.getOrderId() + "|" + request.getPaymentId();
-            String generatedSignature = generateSignature(payload, razorpaySecret);
+        String payload = request.getOrderId() + "|" + request.getPaymentId();
 
-            if (!generatedSignature.equals(request.getSignature())) {
-                throw new RuntimeException("Payment verification failed");
-            }
-            booking.setStatus(BookingStatus.CONFIRMED);
-            bookingRepository.save(booking);
+        String generatedSignature = generateSignature(payload, razorpaySecret);
+
+        if (!generatedSignature.equals(request.getSignature())) {
+            throw new RuntimeException("Payment verification failed");
         }
+
+        // Confirm seats
+        seatLockService.confirmSeats(
+                request.getBookingReference()
+        );
+
+        // Update booking
+        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.setPaymentId(request.getPaymentId());
+        booking.setPaymentStatus("SUCCESS");
+
+        bookingRepository.save(booking);
+    }
 
 
     private String generateSignature(String data, String secret) {

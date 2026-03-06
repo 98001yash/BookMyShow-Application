@@ -139,23 +139,17 @@ public class SeatLockServiceImpl implements SeatLockService {
 
     @Override
     @Transactional
-    public void confirmSeats(Long showId, List<String> seatNumbers) {
+    public void confirmSeats(String bpokingReference) {
 
-        for (String seatNumber : seatNumbers) {
+        List<ShowSeatInventory> seats =
+                inventoryRepository.findLockedSeatsByBookingReference((bpokingReference));
 
-            ShowSeatInventory inventory = inventoryRepository
-                    .findWithLockByShowIdAndSeatLayout_SeatNumber(showId, seatNumber)
-                    .orElseThrow(() ->
-                            new RuntimeException("Seat not found: " + seatNumber));
+        for (ShowSeatInventory seat : seats) {
 
-            if (inventory.getStatus() != SeatStatus.LOCKED) {
-                throw new RuntimeException("Seat is not locked: " + seatNumber);
-            }
+            seat.setStatus(SeatStatus.BOOKED);
+            seat.setLockedUntil(null);
 
-            inventory.setStatus(SeatStatus.BOOKED);
-            inventory.setLockedUntil(null);
         }
-
-        log.info("Seats confirmed for show {} seats={}", showId, seatNumbers);
+        inventoryRepository.saveAll(seats);
     }
 }

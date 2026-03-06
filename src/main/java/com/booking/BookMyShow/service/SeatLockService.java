@@ -24,5 +24,6 @@ public interface SeatLockService {
     void releaseExpiredLocks();
 
 
- void confirmSeats(Long showId, List<String> seatNumbers);
+    // confirm seats
+    void confirmSeats(String bookingReference);
 }

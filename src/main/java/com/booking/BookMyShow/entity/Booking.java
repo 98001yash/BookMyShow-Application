@@ -50,4 +50,11 @@ public class Booking {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+
+    @Column(name = "payment_id")
+    private String paymentId;
+
+    @Column(name = "payment_status")
+    private String paymentStatus;
 }
