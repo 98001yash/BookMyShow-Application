@@ -1,5 +1,6 @@
 package com.booking.BookMyShow.entity;
 
+import com.booking.BookMyShow.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

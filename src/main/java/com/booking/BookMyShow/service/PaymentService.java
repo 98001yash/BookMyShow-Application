@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -16,20 +19,25 @@ public class PaymentService {
     private final RazorpayClient razorpayClient;
     private final BookingRepository bookingRepository;
 
-    public String createPaymentOrder(String bookingReference) throws RazorpayException {
+    public Map<String, Object> createPaymentOrder(String bookingReference) throws RazorpayException {
 
         Booking booking = bookingRepository
                 .findByBookingReference(bookingReference)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        JSONObject options = new JSONObject();
+        int amount = (int)(booking.getTotalAmount() * 100);
 
-        options.put("amount", (int)(booking.getTotalAmount() * 100));
+        JSONObject options = new JSONObject();
+        options.put("amount", amount);
         options.put("currency", "INR");
         options.put("receipt", bookingReference);
 
         Order order = razorpayClient.orders.create(options);
 
-        return order.get("id");
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderId", order.get("id"));
+        response.put("amount", amount);
+
+        return response;
     }
 }

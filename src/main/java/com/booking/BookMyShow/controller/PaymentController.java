@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/payments")
 @RequiredArgsConstructor
@@ -15,8 +17,9 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
+
     @PostMapping("/create-order/{bookingReference}")
-    public String createOrder(@PathVariable String bookingReference) throws RazorpayException {
+    public Map<String, Object> createOrder(@PathVariable String bookingReference) throws RazorpayException {
         return paymentService.createPaymentOrder(bookingReference);
     }
 }
