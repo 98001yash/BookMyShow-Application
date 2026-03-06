@@ -25,7 +25,7 @@ public class PaymentController {
     @PostMapping("/verify")
     public ResponseEntity<?> verifyPayment(
             @RequestBody PaymentVerifyRequest request,
-            @RequestParam String email
+            @RequestParam(required = false) String email
     ) {
 
         paymentService.verifyPayment(request, email);

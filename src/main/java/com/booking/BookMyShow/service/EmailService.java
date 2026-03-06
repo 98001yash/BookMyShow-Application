@@ -19,6 +19,12 @@ public class EmailService {
                                         String bookingReference,
                                         String movieName,
                                         String showTime){
+
+        if(toEmail == null || toEmail.isBlank()){
+            System.out.println("Email is null. Skipping email notification.");
+            return;
+        }
+
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setTo(toEmail);

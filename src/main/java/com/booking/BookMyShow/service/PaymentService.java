@@ -8,6 +8,7 @@ import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentService {
 
     private final RazorpayClient razorpayClient;
@@ -76,12 +78,18 @@ public class PaymentService {
         bookingRepository.save(booking);
 
         // 📩 Send Email
-        emailService.sendBookingConfirmation(
-                userEmail,
-                booking.getBookingReference(),
-                booking.getShow().getMovie().getTitle(),
-                booking.getShow().getStartTime().toString()
-        );
+        if (userEmail != null && !userEmail.isBlank()) {
+
+            emailService.sendBookingConfirmation(
+                    userEmail,
+                    booking.getBookingReference(),
+                    booking.getShow().getMovie().getTitle(),
+                    booking.getShow().getStartTime().toString()
+            );
+
+        } else {
+            log.warn("Email not provided for booking {}", booking.getBookingReference());
+        }
     }
 
 
