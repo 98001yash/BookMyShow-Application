@@ -7,7 +7,6 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <style>
-
         body{
             font-family: Arial;
             background:#f5f5f5;
@@ -39,7 +38,6 @@
         button:hover{
             background:#287ca6;
         }
-
     </style>
 
 </head>
@@ -58,7 +56,7 @@
 
     async function payNow(){
 
-        const bookingReference = "BMS-20260306-PBNZP";
+        const bookingReference = "BMS-20260306-MXJNX";
 
         console.log("Starting payment for booking:", bookingReference);
 
@@ -72,7 +70,7 @@
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMDNAdGVzdC5jb20iLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzcyNzYxOTU3LCJleHAiOjE3NzI3NjU1NTd9.F4RW7j4k1ctF63rDWjQlrToUpNwfdaUrTg74kG0yNOQ"
+                        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMDRAdGVzdC5jb20iLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzcyNzk2MjY4LCJleHAiOjE3NzI3OTk4Njh9.f4ZdYgdhOazFzUR3npR_KCYT0ND5tYUwJHU8JpkPuKA"
                     }
                 }
             );
@@ -101,15 +99,42 @@
 
                 order_id: orderId,
 
-                handler: function (response){
+                handler: async function (response){
 
                     console.log("Payment Success Response:", response);
 
-                    console.log("Razorpay Payment ID:", response.razorpay_payment_id);
-                    console.log("Razorpay Order ID:", response.razorpay_order_id);
-                    console.log("Razorpay Signature:", response.razorpay_signature);
+                    console.log("Payment ID:", response.razorpay_payment_id);
+                    console.log("Order ID:", response.razorpay_order_id);
+                    console.log("Signature:", response.razorpay_signature);
 
-                    alert("Payment Successful!");
+                    // 🔵 CALL BACKEND TO VERIFY PAYMENT
+
+                    const verifyResponse = await fetch(
+                        "http://localhost:8081/payments/verify",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+
+                                bookingReference: bookingReference,
+
+                                paymentId: response.razorpay_payment_id,
+
+                                orderId: response.razorpay_order_id,
+
+                                signature: response.razorpay_signature
+
+                            })
+                        }
+                    );
+
+                    const verifyResult = await verifyResponse.text();
+
+                    console.log("Verification result:", verifyResult);
+
+                    alert("Payment Verified & Booking Confirmed!");
 
                 },
 
