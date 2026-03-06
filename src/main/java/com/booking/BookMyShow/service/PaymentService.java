@@ -57,15 +57,12 @@ public class PaymentService {
                     .orElseThrow(() -> new RuntimeException("Booking not found"));
 
             String payload = request.getOrderId() + "|" + request.getPaymentId();
-
             String generatedSignature = generateSignature(payload, razorpaySecret);
 
             if (!generatedSignature.equals(request.getSignature())) {
                 throw new RuntimeException("Payment verification failed");
             }
-
             booking.setStatus(BookingStatus.CONFIRMED);
-
             bookingRepository.save(booking);
         }
 
@@ -73,16 +70,12 @@ public class PaymentService {
     private String generateSignature(String data, String secret) {
 
         try {
-
             Mac mac = Mac.getInstance("HmacSHA256");
-
             SecretKeySpec secretKey =
                     new SecretKeySpec(secret.getBytes(), "HmacSHA256");
 
             mac.init(secretKey);
-
             byte[] rawHmac = mac.doFinal(data.getBytes());
-
             StringBuilder hex = new StringBuilder();
 
             for (byte b : rawHmac) {
@@ -90,9 +83,7 @@ public class PaymentService {
             }
 
             return hex.toString();
-
         } catch (Exception e) {
-
             throw new RuntimeException("Signature generation failed");
 
         }
