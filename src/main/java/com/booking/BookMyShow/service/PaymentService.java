@@ -67,13 +67,10 @@ public class PaymentService {
 
         // Confirm seats
         seatLockService.confirmSeats(
-                request.getBookingReference()
+                booking.getShow().getId()
         );
 
-        // Update booking
         booking.setStatus(BookingStatus.CONFIRMED);
-        booking.setPaymentId(request.getPaymentId());
-        booking.setPaymentStatus("SUCCESS");
 
         bookingRepository.save(booking);
     }

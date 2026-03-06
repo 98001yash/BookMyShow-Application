@@ -25,5 +25,5 @@ public interface SeatLockService {
 
 
     // confirm seats
-    void confirmSeats(String bookingReference);
+    void confirmSeats(Long showId);
 }

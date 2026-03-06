@@ -51,5 +51,4 @@ AND s.lockedUntil < :time
 """)
     int releaseExpiredLocks(LocalDateTime time);
 
-    List<ShowSeatInventory> findLockedSeatsByBookingReference(String bookingReference);
 }
