@@ -8,8 +8,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class PaymentVerifyRequest {
 
-    private String paymentReference;
+    private String bookingReference;
     private String paymentId;
     private String orderId;
     private String signature;
+
+
 }
