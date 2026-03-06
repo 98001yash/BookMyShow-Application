@@ -3,6 +3,7 @@ package com.booking.BookMyShow.service;
 import com.booking.BookMyShow.dtos.SeatLockRequest;
 import com.booking.BookMyShow.dtos.SeatLockResponse;
 import com.booking.BookMyShow.dtos.SeatStatusResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,4 +22,7 @@ public interface SeatLockService {
 
      //Release expired locks (used by scheduler)
     void releaseExpiredLocks();
+
+
+ void confirmSeats(Long showId, List<String> seatNumbers);
 }

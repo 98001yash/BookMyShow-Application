@@ -118,7 +118,6 @@ public class SeatLockServiceImpl implements SeatLockService {
     @Transactional
     public void releaseExpiredLocks() {
 
-
         int released = inventoryRepository.releaseExpiredLocks(LocalDateTime.now());
         log.info("Released {} expired seat locks", released);
 
@@ -135,5 +134,28 @@ public class SeatLockServiceImpl implements SeatLockService {
         }
 
         log.info("Released {} expired seat locks", expiredLocks.size());
+    }
+
+
+    @Override
+    @Transactional
+    public void confirmSeats(Long showId, List<String> seatNumbers) {
+
+        for (String seatNumber : seatNumbers) {
+
+            ShowSeatInventory inventory = inventoryRepository
+                    .findWithLockByShowIdAndSeatLayout_SeatNumber(showId, seatNumber)
+                    .orElseThrow(() ->
+                            new RuntimeException("Seat not found: " + seatNumber));
+
+            if (inventory.getStatus() != SeatStatus.LOCKED) {
+                throw new RuntimeException("Seat is not locked: " + seatNumber);
+            }
+
+            inventory.setStatus(SeatStatus.BOOKED);
+            inventory.setLockedUntil(null);
+        }
+
+        log.info("Seats confirmed for show {} seats={}", showId, seatNumbers);
     }
 }
