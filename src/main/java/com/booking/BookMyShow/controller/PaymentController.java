@@ -4,6 +4,7 @@ import com.booking.BookMyShow.dtos.PaymentVerifyRequest;
 import com.booking.BookMyShow.service.PaymentService;
 import com.razorpay.RazorpayException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -22,8 +23,12 @@ public class PaymentController {
     }
 
     @PostMapping("/verify")
-    public String verifyPayment(@RequestBody PaymentVerifyRequest request) {
-        paymentService.verifyPayment(request);
-        return "Payment verified and booking confirmed";
+    public ResponseEntity<?> verifyPayment(
+            @RequestBody PaymentVerifyRequest request,
+            @RequestParam String email
+    ) {
+
+        paymentService.verifyPayment(request, email);
+        return ResponseEntity.ok("Payment verified");
     }
 }

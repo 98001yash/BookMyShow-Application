@@ -24,6 +24,7 @@ public class PaymentService {
     private final RazorpayClient razorpayClient;
     private final BookingRepository bookingRepository;
     private final SeatLockService seatLockService;
+    private final EmailService emailService;
 
     @Value("${razorpay.key-secret}")
     private String razorpaySecret;
@@ -51,7 +52,7 @@ public class PaymentService {
 
 
     }
-    public void verifyPayment(PaymentVerifyRequest request) {
+    public void verifyPayment(PaymentVerifyRequest request, String userEmail) {
 
         Booking booking = bookingRepository
                 .findByBookingReference(request.getBookingReference())
@@ -73,6 +74,14 @@ public class PaymentService {
         booking.setStatus(BookingStatus.CONFIRMED);
 
         bookingRepository.save(booking);
+
+        // 📩 Send Email
+        emailService.sendBookingConfirmation(
+                userEmail,
+                booking.getBookingReference(),
+                booking.getShow().getMovie().getTitle(),
+                booking.getShow().getStartTime().toString()
+        );
     }
 
 
