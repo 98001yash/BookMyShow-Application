@@ -27,6 +27,7 @@ public class PaymentService {
     private final BookingRepository bookingRepository;
     private final SeatLockService seatLockService;
     private final EmailService emailService;
+    private final WhatsAppService whatsAppService;
 
     @Value("${razorpay.key-secret}")
     private String razorpaySecret;
@@ -90,6 +91,18 @@ public class PaymentService {
         } else {
             log.warn("Email not provided for booking {}", booking.getBookingReference());
         }
+
+        String message =
+                "🎬 Booking Confirmed!\n\n" +
+                        "Booking Ref: " + booking.getBookingReference() + "\n" +
+                        "Movie: " + booking.getShow().getMovie().getTitle() + "\n" +
+                        "Show Time: " + booking.getShow().getStartTime() + "\n\n" +
+                        "Enjoy your movie! 🍿";
+
+        whatsAppService.sendBookingConfirmation(
+                "+917091844941",
+                message
+        );
     }
 
 
