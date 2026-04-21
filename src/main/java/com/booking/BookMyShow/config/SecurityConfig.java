@@ -1,14 +1,11 @@
 package com.booking.BookMyShow.config;
 
-
 import com.booking.BookMyShow.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,7 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
@@ -32,10 +28,23 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        //Public APIs
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/payments/**").permitAll()
+
+                        // Swagger endpoints (IMPORTANT)
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml"
+                        ).permitAll()
+
+                        //  Role-based APIs
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/booking/**").hasRole("USER")
+
+                        // ❗ Everything else secured
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
@@ -59,6 +68,4 @@ public class SecurityConfig {
             AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
-
 }
